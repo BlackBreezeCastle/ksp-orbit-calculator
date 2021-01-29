@@ -2,7 +2,7 @@
 
 void parseSkip(const std::string &str, int &i)
 {
-	while (str[i] == ' ' ||str[i]== '\n')
+	while (str[i] == ' ' ||str[i]== '\n' ||str[i]=='\r')
 	{
 		i++;
 	}

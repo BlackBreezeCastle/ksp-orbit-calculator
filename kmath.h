@@ -7,13 +7,15 @@ double normalized_angle(double angle);
 
 double normalized_rad(double rad);
 
+double atanh(double x);
+
 //ÈýÎ¬ÏòÁ¿
 class _declspec(dllexport) Vector3
 {
 private:
-	double m_x = 0.0;
-	double m_y = 0.0;
-	double m_z = 0.0;
+	double m_x;
+	double m_y;
+	double m_z;
 
 public:
 	Vector3();

@@ -30,14 +30,20 @@ void orbit::reset_orbit(Vector3 r, Vector3 v, double t, string _body)
 	//reset_orbit(r,v,t,bodies::instance()[body].gm);
 }
 
+void orbit::set_body_name(std::string name)
+{
+	body=name;
+}
+
 void orbit::reset_orbit(Vector3 r, Vector3 v, double t, double gm)
 {
 	next = NULL;
 	t_next = -1;
 	t0 = t;
 	u = gm;
+	//energy
 	double E = 0.5*pow(v.magnitude(), 2) - u / r.magnitude();
-	
+
 	Vector3 y = Vector3(0.0, 1.0, 0.0);
 	Vector3 x = Vector3(1.0, 0.0, 0.0);
 	h = Vector3::Cross(r, v);
@@ -45,12 +51,20 @@ void orbit::reset_orbit(Vector3 r, Vector3 v, double t, double gm)
 	if (E != 0.0)
 	{
 		sem = -0.5*u / E;
-		ecc = pow(1 -h2/ (u*sem), 0.5);
+		ecc = pow(max(1 -h2/ (u*sem),0.0), 0.5);
 	}
 
 	period = 2 * PI*pow(sem, 1.5) / pow(u, 0.5);
 
-	f0 = R_to_F(ecc,sem,r.magnitude());
+	if(ecc!=0.0)
+	{
+		f0 = R_to_F(ecc,sem,r.magnitude());
+	}
+	else
+	{
+		f0=0.0;
+	}
+
 	if (Vector3::Dot(r, v) < 0)
 	{
 		f0 = -f0;
@@ -61,11 +75,17 @@ void orbit::reset_orbit(Vector3 r, Vector3 v, double t, double gm)
 	inc = PI - Vector3::Angle(h, y);
 
 	Vector3 vlan = Vector3::Cross(y, h);
+	if(vlan.magnitude()<1e-16)
+	{
+		vlan=pe;
+	}
+
 	lan = Vector3::Angle(vlan, x);
 	if (Vector3::Dot(h, y) > 0.0)
 	{
 		lan = -lan;
 	}
+
 
 	aop = Vector3::Angle(pe, vlan);
 	if (Vector3::Dot(Vector3::Cross(pe, vlan), h) > 0)
@@ -73,7 +93,7 @@ void orbit::reset_orbit(Vector3 r, Vector3 v, double t, double gm)
 		aop = 2*PI-aop;
 	}
 
-    E = F_to_E(ecc, f0);
+	E = F_to_E(ecc, f0);
 	double M = E_to_M(ecc, F_to_E(ecc, f0));
 	double n = pow(fabs(u / (sem*sem*sem)), 0.5);
 	tao = t0 - M / n;
@@ -122,12 +142,11 @@ state orbit::state_at_t(double t)
 
 bodies::bodies()
 {
-	Config cfg("config.txt");
+	Config cfg("kerbal_config.txt");
 	queue<string>q;
 	q.push("Sun");
 	while (!q.empty())
 	{
-		auto tmps = cfg["Vall"];
 		string name= q.front();
 		auto tmp = cfg[name];
 		celestial_body b;
@@ -138,7 +157,7 @@ bodies::bodies()
 		b.atmosphere_depth = tmp["atmosphere_depth"].asDouble();
 		b.parent = tmp["parent"].asString();
 		b.rotation = Quaternion(tmp["quaternion"][0].asDouble(), tmp["quaternion"][1].asDouble(), tmp["quaternion"][2].asDouble(), tmp["quaternion"][3].asDouble());
-		
+
 		if (name != "Sun")
 		{
 			double parent_gm = m_bodies.find(b.parent)->second.gm;
@@ -146,6 +165,7 @@ bodies::bodies()
 			Vector3 position(tmp["position"][0].asDouble(), tmp["position"][1].asDouble(), tmp["position"][2].asDouble());
 			Vector3 velocity(tmp["velocity"][0].asDouble(), tmp["velocity"][1].asDouble(), tmp["velocity"][2].asDouble());
 			b.orbit.reset_orbit(position, velocity, t0, parent_gm);
+			b.orbit.set_body_name(b.parent);
 		}
 
 		for (int i = 0; i < tmp["satellites"].size();i++)
@@ -175,7 +195,7 @@ celestial_body bodies::operator[](string name)
 	celestial_body invalid;
 	return invalid;
 }
-/*
+
 inline double orbit_dis(orbit &a, orbit &b, const double& t)
 {
 	return  (a.position_at_t(t) - b.position_at_t(t)).magnitude();
@@ -187,28 +207,25 @@ double closest_dichotomy(orbit &a, orbit &b, const double& t0,const double &tf,i
 	double lr = tf;
 	while (count > 0)
 	{
-		double tmp1 = (lt + lr) / 2;
+		double tmp1 = 0.5*(lt + lr);
 		double tmp2 = tmp1 + 0.1;
 		double disl = (a.position_at_t(tmp1) - b.position_at_t(tmp1)).magnitude();
 		double disr = (a.position_at_t(tmp2) - b.position_at_t(tmp2)).magnitude();
 		if (disl > disr)
 		{
 			lt = tmp1;
-			disl = (a.position_at_t(lt) - b.position_at_t(lt)).magnitude();
 		}
 		else
 		{
 			lr = tmp1;
-			disr = (a.position_at_t(lr) - b.position_at_t(lr)).magnitude();
 		}
 		count--;
 	}
-	return (lt + lr) / 2;
+	return 0.5*(lt + lr);
 }
 
-double find_closest_t(const orbit &a, const orbit &b, int round = 1)
-{
-	double period = a.period < b.period ? a.period : b.period;
+//double find_closest_t(const orbit &a, const orbit &b, int round = 1)
+//{
+//double period = a.period < b.period ? a.period : b.period;
 
-}
-*/
+//}

@@ -48,14 +48,18 @@ private:
 	orbit * next;
 public:
 	orbit();
+
 	orbit(Vector3 r, Vector3 v, double t, double gm);
+
 	void reset_orbit(Vector3 r, Vector3 v, double t, double gm);
+
 	void reset_orbit(Vector3 r, Vector3 v, double t, string body);
 
 	Vector3 position_at_t(double t);
 
 	state state_at_t(double t);
 
+	void set_body_name(std::string name);
 	//double friend find_closest_t(const orbit &a, const orbit &b,int round=1);
 };
 
