@@ -3,6 +3,7 @@
 #include<algorithm>
 
 #define PI 3.14159265358979323846
+#define INFINITY_DOUBLE 1e20
 double normalized_angle(double angle);
 
 double normalized_rad(double rad);

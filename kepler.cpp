@@ -1,5 +1,4 @@
 #include"kepler.h"
-
 /* ---------------------------------------------------------------------
 **
 ** º¯ÊýÃû³Æ: KeplerStart3
@@ -93,7 +92,7 @@ double F_to_E(double ecc, double F)
 	}
 	else if (ecc > 1.0)
 	{
-		return 2.0*atanh(pow((ecc - 1.0) / (1.0 + ecc), 0.5)*tan(0.5*F));
+		return 2.0* atanh(pow((ecc - 1.0) / (1.0 + ecc), 0.5)*tan(0.5*F));
 	}
 }
 
@@ -149,7 +148,8 @@ double kepler_E(double ecc, double M)
 
 double kepler_H(double e, double M)
 {
-	double H = M;
+	double H = 2.0 * M / e;
+    H = log(sqrt(H * H + 1.0) + H);
 	double ratio = 1.0;
 	while (fabs(ratio) >error)
 	{
