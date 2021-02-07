@@ -387,7 +387,7 @@
             "Jool",
             "Eeloo"
         ],
-        "soi": Infinity,
+        "soi": 1e15,
         "t0": 91054.59166041283,
         "velocity": [
             0.0,

@@ -29,11 +29,12 @@ void main(void)
 		ob0.longitude_of_ascend_node(),
 		ob0.incliantion(),
 		ob0.argument_of_perigee(),
-		ob0.gravity_parameter(),
 		ob0.mean_anomaly0(),
-		t1);
-	auto tmp1=ob0.position_at_t(t2);
-	auto tmp2=ob1.position_at_t(t2);
+		t1,
+		ob0.body());
+	ob0.next_orbit()->next_orbit()->print();
+	ob1.next_orbit()->next_orbit()->print();	
+
 	// tmp=ob0.next_orbit()->next_orbit()->position_at_f(0).magnitude()-6371000;
 	//Vector3 r1=Vector3(-2287279.628581712,1840195.812273841,3344967.7613846688);
 	//Vector3 v1=Vector3(177.18669464183063,774.61348477921,1453.8379484944592);

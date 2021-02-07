@@ -58,11 +58,11 @@ public:
 
 	void reset_orbit(Vector3 r, Vector3 v, double t, double gm);
 
-	void reset_orbit(Vector3 r, Vector3 v, double t, string body,const int&round=5);
+	void reset_orbit(Vector3 r, Vector3 v, double t, string body,const int&round=3);
 
 	void reset_orbit(double sem,double ecc,double lan,double inc,double aop,double m0,double t0,double gm);
 
-	void reset_orbit(double sem,double ecc,double lan,double inc,double aop,double m0,double t0,std::string body,const int &round =5);
+	void reset_orbit(double sem,double ecc,double lan,double inc,double aop,double m0,double t0,std::string body,const int &round =3);
 
 	orbit& operator =(const orbit &ob);
 

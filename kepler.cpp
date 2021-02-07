@@ -10,7 +10,7 @@
 **
 ** ---------------------------------------------------------------------*/
 #define D2PI (3.14159265358979323846)
-#define error 1.0e-15
+#define error 1.0e-14
 
 double KeplerStart3(double ecc, double M) {
 

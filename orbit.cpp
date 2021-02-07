@@ -280,7 +280,7 @@ void orbit::set_body_name(std::string name)
 	m_Body=name;
 }
 
-void orbit::reset_orbit(double sem,double ecc,double lan,double inc,double aop,double gm,double m0,double t0)
+void orbit::reset_orbit(double sem,double ecc,double lan,double inc,double aop,double m0,double t0,double gm)
 {
 	m_Sem=sem;
 	m_Ecc=ecc;
@@ -289,6 +289,7 @@ void orbit::reset_orbit(double sem,double ecc,double lan,double inc,double aop,d
 	m_Aop=aop;
 	m_Gm=gm;
 	m_T0=t0;
+	m_M0=m0;
 	//count the period
 	m_period = 2 * PI*pow((pow(m_Sem,3) /m_Gm),0.5);
 
@@ -315,7 +316,12 @@ void orbit::reset_orbit(double sem,double ecc,double lan,double inc,double aop,d
 	double n = pow(fabs(m_Gm / (m_Sem*m_Sem*m_Sem)), 0.5);
 }
 
-void orbit::reset_orbit(double sem,double ecc,double lan,double inc,double aop,double gm,double m0,double t0)
+void orbit::reset_orbit(double sem,double ecc,double lan,double inc,double aop,double m0,double t0,std::string body,const int &round)
+{
+	m_Body=body;
+	reset_orbit(sem,ecc,lan,inc,aop,m0,t0,bodies::instance()[body].gm);
+	count_next_orbit(round);
+}
 
 void orbit::reset_orbit(Vector3 r, Vector3 v, double t, double gm)
 {
@@ -450,7 +456,7 @@ state orbit::state_at_t(double t)const
 
 void orbit::print()const
 {
-	printf("\n m_Ecc:%.17lf \n m_Sem:%.17lf \n m_Inc:%.17lf \n m_Lan:%.17lf \n m_Aop:%.17lf \n",m_Ecc,m_Sem,m_Inc*180/PI,m_Lan*180/PI,m_Aop*180/PI);
+	printf("\n m_Ecc:%.17lf \n m_Sem:%.17lf \n m_Inc:%.17lf \n m_Lan:%.17lf \n m_Aop:%.17lf \n m_M0 %.17lf\n",m_Ecc,m_Sem,m_Inc*180/PI,m_Lan*180/PI,m_Aop*180/PI,m_M0);
 
 }
 
