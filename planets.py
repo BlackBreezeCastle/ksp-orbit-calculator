@@ -8,7 +8,7 @@ sun=conn.space_center.bodies['Sun']
 vessel=conn.space_center.active_vessel
 
 ''
-fp=open('config.txt','w')
+fp=open('solar_config.txt','w')
 fp.close()
 ''
 
@@ -22,11 +22,10 @@ def planet_rotation(child):
     
 
 def write_json(data):
-    fp=open('config.txt','a+')
+    fp=open('solar_config.txt','a+')
     fp.write(data)
     fp.write('\n')
     fp.close()
-
 
 def load_json(root):
     children=[]
@@ -35,20 +34,26 @@ def load_json(root):
     for i in root.satellites:
         children.append(i.name)
     if root.orbit==None:
-        position=(0.0,0.0,0.0)
-        velocity=(0.0,0.0,0.0)
+        sem=0.0
+        ecc=0.0
+        inc=0.0
+        lan=0.0
+        aop=0.0
+        m0=0.0
         quaternion=(1.0,0.0,0.0,0.0)
     else:
+        orbit=root.orbit
         parent=root.orbit.body.name
-        reference_frame=root.orbit.body.non_rotating_reference_frame
-        t0=conn.space_center.ut
-        position=root.position(reference_frame)
-        velocity=root.velocity(reference_frame)
+        sem=orbit.semi_major_axis
+        ecc=orbit.eccentricity
+        inc=orbit.inclination
+        lan=orbit.longitude_of_ascending_node
+        aop=orbit.argument_of_periapsis
+        m0=orbit.mean_anomaly_at_ut(0.0)
         quaternion=planet_rotation(root)
-
-    data={root.name:{'gm':root.gravitational_parameter,'radius':root.equatorial_radius,'atmosphere_depth':root.atmosphere_depth,\
+    data={root.name:{'gm':root.gravitational_parameter,'radius':root.equatorial_radius,'atmosphere_depth':root.atmosphere_depth,'quaternion':quaternion,\
     'soi':root.sphere_of_influence,'satellites':children,'parent':parent,\
-    'position':position,'velocity':velocity,'quaternion':quaternion,'t0':t0}}
+    'sem':sem,'ecc':ecc,'inc':inc,'lan':lan,'aop':aop,'m0':m0}}
     global data2
     data2={**data2,**data}
 
