@@ -3,12 +3,11 @@
 #include<vector>
 #include<map>
 #include"kepler.h"
-//#include"kepler.cpp"
-//#include"config.m_H"
 struct state
 {
 	Vector3 r;
 	Vector3 v;
+	std::string body;
 	double t;
 };
 //左手坐标系
@@ -52,7 +51,7 @@ public:
 
 	orbit(Vector3 r, Vector3 v, double t, double gm);
 
-	orbit(double sem,double ecc,double lan,double inc,double aop,double m0,double t0,double gm);
+	//orbit(double sem,double ecc,double inc,double lan,double aop,double m0,double t0,double gm);
 
 	~orbit();
 
@@ -60,9 +59,9 @@ public:
 
 	void reset_orbit(Vector3 r, Vector3 v, double t, string body,const int&round=3);
 
-	void reset_orbit(double sem,double ecc,double lan,double inc,double aop,double m0,double t0,double gm);
+	void reset_orbit(double sem,double ecc,double inc,double lan,double aop,double m0,double t0,double gm);
 
-	void reset_orbit(double sem,double ecc,double lan,double inc,double aop,double m0,double t0,std::string body,const int &round =3);
+	void reset_orbit(double sem,double ecc,double inc,double lan,double aop,double m0,double t0,std::string body,const int &round =3);
 
 	orbit& operator =(const orbit &ob);
 
@@ -77,7 +76,11 @@ public:
 
 	double t_to_f(double t0,double f)const;
 
+	state Kstate_at_t(double t)const;
+
 	state state_at_t(double t)const;
+
+	state state_at_f(double F)const;
 
 	const orbit * next_orbit()const;
 
@@ -108,6 +111,9 @@ public:
 	double gravity_parameter()const;
 
 	double mean_anomaly0()const;
+
+	//b平面参数
+	bool b_parameter(double &bt,double &br)const;
 private:
 	void set_body_name(std::string name);
 

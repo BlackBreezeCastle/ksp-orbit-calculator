@@ -17,12 +17,12 @@ double closest_dichotomy(const orbit &a, const orbit &b, const double& t0,const 
 	double tmp2;
 	double disl;
 	double disr;
+	tmp1 = 0.5*(lt + lr);
+	tmp2 = tmp1 + 0.1;
+	disl = (a.position_at_t(tmp1) - b.position_at_t(tmp1)).magnitude();
+	disr = (a.position_at_t(tmp2) - b.position_at_t(tmp2)).magnitude();
 	while (fabs(lt-lr)>1)
 	{
-		tmp1 = 0.5*(lt + lr);
-		tmp2 = tmp1 + 0.1;
-		disl = (a.position_at_t(tmp1) - b.position_at_t(tmp1)).magnitude();
-		disr = (a.position_at_t(tmp2) - b.position_at_t(tmp2)).magnitude();
 		if (disl > disr)
 		{
 			lt = tmp1;
@@ -31,6 +31,10 @@ double closest_dichotomy(const orbit &a, const orbit &b, const double& t0,const 
 		{
 			lr = tmp1;
 		}
+		tmp1 = 0.5*(lt + lr);
+		tmp2 = tmp1 + 0.1;
+		disl = (a.position_at_t(tmp1) - b.position_at_t(tmp1)).magnitude();
+		disr = (a.position_at_t(tmp2) - b.position_at_t(tmp2)).magnitude();
 	}
 	if(closest_dis!=NULL)
 	{
@@ -275,12 +279,14 @@ orbit&orbit::operator=(const orbit &ob)
 	return *this;
 }
 
+
+
 void orbit::set_body_name(std::string name)
 {
 	m_Body=name;
 }
 
-void orbit::reset_orbit(double sem,double ecc,double lan,double inc,double aop,double m0,double t0,double gm)
+void orbit::reset_orbit(double sem,double ecc,double inc,double lan,double aop,double m0,double t0,double gm)
 {
 	m_Sem=sem;
 	m_Ecc=ecc;
@@ -316,10 +322,10 @@ void orbit::reset_orbit(double sem,double ecc,double lan,double inc,double aop,d
 	double n = pow(fabs(m_Gm / (m_Sem*m_Sem*m_Sem)), 0.5);
 }
 
-void orbit::reset_orbit(double sem,double ecc,double lan,double inc,double aop,double m0,double t0,std::string body,const int &round)
+void orbit::reset_orbit(double sem,double ecc,double inc,double lan,double aop,double m0,double t0,std::string body,const int &round)
 {
 	m_Body=body;
-	reset_orbit(sem,ecc,lan,inc,aop,m0,t0,bodies::instance()[body].gm);
+	reset_orbit(sem,ecc,inc,lan,aop,m0,t0,bodies::instance()[body].gm);
 	count_next_orbit(round);
 }
 
@@ -343,7 +349,15 @@ void orbit::reset_orbit(Vector3 r, Vector3 v, double t, double gm)
 		m_Ecc = pow(max(1 -h2/ (m_Gm*m_Sem),0.0), 0.5);
 	}
 
-	m_period = 2 * PI*pow((pow(m_Sem,3) /m_Gm),0.5);
+	if (m_Sem > 0)
+	{
+		m_period = 2 * PI*pow((pow(m_Sem, 3) / m_Gm), 0.5);
+	}
+	else
+	{
+		m_period = -1.0;
+	}
+
 
 	if(m_Ecc!=0.0)
 	{
@@ -435,13 +449,14 @@ double orbit::t_to_f(double t0,double f)const
 	return t;
 }
 
-state orbit::state_at_t(double t)const
+state orbit::Kstate_at_t(double t)const
 {
 	if(t>m_t_next)
 	{
 		return m_Next->state_at_t(t);
 	}
 	state ret;
+	ret.body = m_Body;
 	ret.t = t;
 	double F = f_at_t(t);
 	ret.r= position_at_f(F);
@@ -454,10 +469,41 @@ state orbit::state_at_t(double t)const
 	return ret;
 }
 
+state orbit::state_at_t(double t)const
+{
+	state ret;
+	ret.body = m_Body;
+	ret.t = t;
+	double F = f_at_t(t);
+	ret.r = position_at_f(F);
+
+	Vector3 wr = Vector3::Cross(m_H, ret.r).normalized()*m_H.magnitude() / ret.r.magnitude();
+	double tmp = 1 + m_Ecc*cos(F);
+	tmp = tmp*tmp;
+	double dr_dt = m_Sem*(m_Ecc*m_Ecc - 1)*m_Ecc*sin(-F) / tmp;
+	ret.v = dr_dt*wr.magnitude() / ret.r.magnitude() *ret.r.normalized() + wr;
+	return ret;
+}
+
+state orbit::state_at_f(double F)const
+{
+	state ret;
+	ret.body = m_Body;
+	ret.t = t_to_f(m_T0, F)+ m_T0;
+	ret.r = position_at_f(F);
+
+	Vector3 wr = Vector3::Cross(m_H, ret.r).normalized()*m_H.magnitude() / ret.r.magnitude();
+	double tmp = 1 + m_Ecc*cos(F);
+	tmp = tmp*tmp;
+	double dr_dt = m_Sem*(m_Ecc*m_Ecc - 1)*m_Ecc*sin(-F) / tmp;
+	ret.v = dr_dt*wr.magnitude() / ret.r.magnitude() *ret.r.normalized() + wr;
+	return ret;
+}
+
 void orbit::print()const
 {
-	printf("\n m_Ecc:%.17lf \n m_Sem:%.17lf \n m_Inc:%.17lf \n m_Lan:%.17lf \n m_Aop:%.17lf \n m_M0 %.17lf\n",m_Ecc,m_Sem,m_Inc*180/PI,m_Lan*180/PI,m_Aop*180/PI,m_M0);
-
+	printf("\n Body:%s\n Gm:%lf\n m_Ecc:%.17lf \n m_Sem:%.17lf \n m_Inc:%.17lf \n m_Lan:%.17lf \n m_Aop:%.17lf \n m_M0 %.17lf\n",
+		m_Body.c_str(), m_Gm, m_Ecc, m_Sem, m_Inc * 180 / PI, m_Lan * 180 / PI, m_Aop * 180 / PI, m_M0);
 }
 
 std::string orbit::body()const
@@ -514,6 +560,24 @@ double orbit::mean_anomaly0()const
 	return m_M0;
 }
 
+bool orbit::b_parameter(double & bt, double & br) const
+{
+	if (m_Ecc <= 1.0)
+	{
+		return false;
+	}
+	double a = -m_Sem;
+	double b = pow((m_Ecc*m_Ecc - 1)*a*a, 0.5);
+	double theta = b / a;
+	double cosi = cos(m_Inc);
+	double sini = sin(m_Inc);
+	double cos_w_theta = cos(theta + m_Aop);
+	double div= (cosi*cosi + sini*sini*cos_w_theta*cos_w_theta);
+	bt = (b*cosi) / div;
+	br = (b*sini*cos_w_theta / div);
+	return true;
+}
+
 bodies::bodies()
 {
 	Config cfg("solar_config.txt");
@@ -534,11 +598,14 @@ bodies::bodies()
 
 		if (name != "Sun")
 		{
+			double sem = tmp["sem"].asDouble();
+			double ecc = tmp["ecc"].asDouble();
+			double inc = tmp["inc"].asDouble();
+			double lan = tmp["lan"].asDouble();
+			double aop = tmp["aop"].asDouble();
+			double m0 = tmp["m0"].asDouble();
 			double parent_gm = m_bodies.find(b.parent)->second.gm;
-			double t0 = tmp["t0"].asDouble();
-			Vector3 position(tmp["position"][0].asDouble(), tmp["position"][1].asDouble(), tmp["position"][2].asDouble());
-			Vector3 velocity(tmp["velocity"][0].asDouble(), tmp["velocity"][1].asDouble(), tmp["velocity"][2].asDouble());
-			b.orbit.reset_orbit(position, velocity, t0, parent_gm);
+			b.orbit.reset_orbit(sem,ecc,lan,inc,aop,m0,0.0,parent_gm);
 			b.orbit.set_body_name(b.parent);
 		}
 
@@ -569,8 +636,3 @@ celestial_body bodies::operator[](string name)
 	celestial_body invalid;
 	return invalid;
 }
-
-
-
-
-
