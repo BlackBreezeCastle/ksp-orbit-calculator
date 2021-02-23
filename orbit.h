@@ -12,6 +12,7 @@ struct state
 };
 //左手坐标系
 using namespace std;
+
 class orbit
 {
 	friend class bodies;
@@ -49,6 +50,10 @@ private:
 public:
 	orbit();
 
+	//orbit(const orbit & ob);
+
+	//orbit(const orbit &&ob);
+
 	orbit(Vector3 r, Vector3 v, double t, double gm);
 
 	//orbit(double sem,double ecc,double inc,double lan,double aop,double m0,double t0,double gm);
@@ -61,9 +66,11 @@ public:
 
 	void reset_orbit(double sem,double ecc,double inc,double lan,double aop,double m0,double t0,double gm);
 
-	void reset_orbit(double sem,double ecc,double inc,double lan,double aop,double m0,double t0,std::string body,const int &round =3);
+	void reset_orbit(double sem,double ecc,double inc,double lan,double aop,double m0,double t0,std::string body,const int &round =2);
 
 	orbit& operator =(const orbit &ob);
+
+	//orbit& operator =(const orbit &&ob);
 
 public:
 	Vector3 position_at_t(double t)const;
@@ -98,6 +105,8 @@ public:
 
 	Vector3 periapsis()const; 
 
+	Vector3 angular_momentum()const;
+
 	double eccentric()const;
 
 	double semimajor_axis()const;
@@ -111,6 +120,10 @@ public:
 	double gravity_parameter()const;
 
 	double mean_anomaly0()const;
+
+	double conic_a()const;
+	
+	double conic_b()const;
 
 	//b平面参数
 	bool b_parameter(double &bt,double &br)const;
@@ -132,6 +145,23 @@ struct celestial_body
 	Quaternion rotation;
 	orbit orbit;
 	celestial_body(){gm=0;radius=0;atmosphere_depth=0,soi=0;name="";parent="";}
+	/*
+	celestial_body(const celestial_body&&b)
+	{
+		gm=b.gm;
+		radius=b.radius;
+		atmosphere_depth=b.atmosphere_depth;
+		soi=b.soi;
+		name=b.name;
+		parent=b.parent;
+		for(int i=0;i<satellites.size();i++)
+		{
+			satellites.push_back(b.satellites[i]);
+		}
+		rotation=b.rotation;
+		orbit=b.orbit;
+	}
+	*/
 };
 
 class bodies
