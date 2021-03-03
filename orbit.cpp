@@ -619,6 +619,11 @@ double orbit::mean_anomaly0()const
 	return m_M0;
 }
 
+double orbit::t0()const
+{
+	return m_T0;
+}
+
 double orbit::conic_a()const
 {
 	return abs(m_Sem);

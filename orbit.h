@@ -125,6 +125,8 @@ public:
 	
 	double conic_b()const;
 
+	double t0()const;
+
 	//b平面参数
 	bool b_parameter(double &bt,double &br)const;
 private:
