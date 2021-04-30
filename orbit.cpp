@@ -2,8 +2,6 @@
 #include "config.h"
 #include <queue>
 
-
-
 inline double orbit_dis(const orbit &a, const orbit &b, const double& t)
 {
 	return  (a.position_at_t(t) - b.position_at_t(t)).magnitude();
@@ -619,11 +617,6 @@ double orbit::mean_anomaly0()const
 	return m_M0;
 }
 
-double orbit::t0()const
-{
-	return m_T0;
-}
-
 double orbit::conic_a()const
 {
 	return abs(m_Sem);
@@ -669,7 +662,8 @@ bodies::bodies()
 		b.atmosphere_depth = tmp["atmosphere_depth"].asDouble();
 		b.parent = tmp["parent"].asString();
 		b.rotation = Quaternion(tmp["quaternion"][0].asDouble(), tmp["quaternion"][1].asDouble(), tmp["quaternion"][2].asDouble(), tmp["quaternion"][3].asDouble());
-
+		b.rotate_speed = tmp["rotate_speed"].asDouble();
+		b.init_rotation = tmp["init_rotation"].asDouble();
 		if (name != "Sun")
 		{
 			double sem = tmp["sem"].asDouble();

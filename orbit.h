@@ -125,8 +125,6 @@ public:
 	
 	double conic_b()const;
 
-	double t0()const;
-
 	//b平面参数
 	bool b_parameter(double &bt,double &br)const;
 private:
@@ -141,12 +139,24 @@ struct celestial_body
 	double radius;
 	double atmosphere_depth;
 	double soi;
+	double init_rotation;
+	double rotate_speed;
 	string name;
 	string parent;
 	vector<string> satellites;
 	Quaternion rotation;
 	orbit orbit;
-	celestial_body(){gm=0;radius=0;atmosphere_depth=0,soi=0;name="";parent="";}
+	celestial_body() 
+	{ 
+		gm = 0; 
+		radius = 0; 
+		atmosphere_depth = 0;
+		soi = 0;
+		init_rotation=0; 
+		rotate_speed = 0.0;
+		name = ""; 
+		parent = "";
+	}
 	/*
 	celestial_body(const celestial_body&&b)
 	{
