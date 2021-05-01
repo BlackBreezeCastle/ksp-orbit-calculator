@@ -3,6 +3,30 @@
 #include<Windows.h>
 #include"orbit.h"
 using namespace std;
+
+double equator_node_lon(double lon, double lat, double inc, bool is_ascend = false)
+{
+	double b = tan(lat)*tan(PI / 2 - inc);
+	b = b < -1.0 ? -1.0 : b;
+	b = b > 1.0 ? 1.0 : b;
+	b = asin(b);
+	if (is_ascend)
+		return lon - b;
+	else
+		return lon + b;
+}
+
+double time_to_orbit_over(double t_start, double lon, double lat, double lan, double inc, std::string planet, bool ascend_orbit = false)
+{
+	celestial_body body = bodies::instance()[planet];
+	double tmp_lan = equator_node_lon(lon, lat, inc, ascend_orbit);
+	tmp_lan = lan - tmp_lan;
+	if (tmp_lan < 0.0)
+	{
+		tmp_lan = tmp_lan + 2 * PI;
+	}
+}
+
 void filter(double &a,double &b,double _max=0.01)
 {
 	double maxab=max(fabs(a),fabs(b));
