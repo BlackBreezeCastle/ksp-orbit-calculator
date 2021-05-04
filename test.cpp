@@ -4,6 +4,63 @@
 #include"orbit.h"
 using namespace std;
 
+inline orbit transfer(const orbit &ob,
+		 const double &slip_t,
+		 const double &v)
+{
+	orbit obt;
+	state rv=ob.state_at_t(ob.t0()+slip_t);
+	rv.v=rv.v.normalized()*v;
+	obt.reset_orbit(rv.r,rv.v,ob.t0()+slip_t,ob.body());
+	return obt;
+}
+
+orbit get_slip_orbit(const double &start_t,
+					const double&lan)
+{
+	double lon=1.936535765863177;
+	double lat=0.3423248200098106;
+	double inc=radians(28.5);
+	double alt=150000;//初始轨道高度
+	double range=2500000;//发射入轨射程
+	double launch_t=time_to_orbit_over(start_t,lon,lat,lan,inc,"Earth")-300;
+	double orbit_t=launch_t+600;
+	auto earth=bodies::instance()["Earth"];
+	auto moon=bodies::instance()["Moon"];
+	orbit slip_obt;
+	slip_obt.reset_orbit(earth.radius+alt,0,inc,lan,0,0,0,earth.gm);
+	Vector3 r=earth.msl_position(lon,lat,0,launch_t);
+	r=Quaternion(slip_obt.h(),range/earth.radius).rotate(r);
+	auto state_init= slip_obt.state_at_f(slip_obt.f_at_position(r));
+
+	slip_obt.reset_orbit(state_init.r,state_init.v,orbit_t,earth.name);
+	return slip_obt;
+}
+
+bool init_transfer(double lon,double lat,double start_t,double &slip_t,orbit &slip_obt,double &vpe)
+{
+	double lan=0.04008351366616158;//月球升交点
+	double inc=radians(28.5);
+    slip_obt=get_slip_orbit(start_t,lan);
+	double alt=150000;//初始轨道高度	
+	auto earth=bodies::instance()["Earth"];
+	auto moon=bodies::instance()["Moon"];
+	double pe=earth.radius+alt;
+	double ap=moon.orbit.position_at_t(slip_obt.t0()+500000).magnitude()+20000000;
+	double sem=0.5*(pe+ap);
+	double transfer_t=0.5*orbit_period(0.5*(pe+ap),earth.gm);
+	double E=-0.5*earth.gm/sem;
+	vpe=pow(2*(E+earth.gm/pe),0.5);
+	Vector3 pe_r=-pe*moon.orbit.position_at_t(start_t+transfer_t).normalized();
+	slip_t=slip_obt.t_to_f(slip_obt.t0(),slip_obt.f_at_position(pe_r));
+	orbit trans_obt=transfer(slip_obt,slip_t,vpe);
+	if(trans_obt.next_orbit()==NULL)
+	{
+		return false;
+	}
+	return true;
+}
+
 double equator_node_lon(double lon, double lat, double inc, bool is_ascend = false)
 {
 	double b = tan(lat)*tan(PI / 2 - inc);
