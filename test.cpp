@@ -83,8 +83,8 @@ orbit get_slip_orbit(const double &start_t,
 	double lon=1.936535765863177;
 	double lat=0.3423248200098106;
 	double inc=radians(28.5);
-	double alt=150000;//³õÊ¼¹ìµÀ¸ß¶È
-	double range=2500000;//·¢ÉäÈë¹ìÉä³Ì
+	double alt=150000;//åˆå§‹è½¨é“é«˜åº¦
+	double range=2500000;//å‘å°„å…¥è½¨å°„ç¨‹
 	double launch_t=time_to_orbit_over(start_t,lon,lat,lan,inc,"Earth")-300;
 	double orbit_t=launch_t+600;
 	auto earth=bodies::instance()["Earth"];
@@ -103,7 +103,7 @@ bool init_transfer(double lon,double lat,double lan,double start_t,double &slip_
 {
 	double inc=radians(28.5);
     slip_obt=get_slip_orbit(start_t,lan);
-	double alt=150000;//³õÊ¼¹ìµÀ¸ß¶È	
+	double alt=150000;//åˆå§‹è½¨é“é«˜åº¦	
 	auto earth=bodies::instance()["Earth"];
 	auto moon=bodies::instance()["Moon"];
 	double pe=earth.radius+alt;
@@ -121,8 +121,6 @@ bool init_transfer(double lon,double lat,double lan,double start_t,double &slip_
 	}
 	return true;
 }
-
-
 
 
 bool init_transfer(double start_t,orbit&ret)
@@ -255,6 +253,114 @@ bool transfer_orbit(const orbit &ob,orbit &ret,double pe=200000+1737100)
 	return true;
 }
 
+bool correct_orbit(const orbit &ob,
+				   const double &correct_t,
+				   Vector3 &dv,
+				   double pe=200000+1737100)
+{
+	double bt0,bt1,bt2,br0,br1,br2;
+	dv=Vector3(0,0,0);
+	state s0=ob.state_at_t(correct_t);
+
+	Vector3 dx=Vector3::Cross(s0.r,s0.v).normalized();
+	Vector3 dy=s0.v.normalized();
+
+	double dif=radians(0.01);
+	Matrix mdif(2,2);
+	Matrix bias(2,1);
+	Matrix tar_dif(2,1);
+
+	auto earth=bodies::instance()["Earth"];
+
+	const double init_period=orbit_period(ob.periapsis().magnitude(),earth.gm);
+	const double period=ob.period();
+
+
+	for(double i=1;i<50;i++)
+	{
+		orbit a0;
+		a0.reset_orbit(s0.r,s0.v+dv,s0.t,s0.body);
+		if(a0.next_orbit()==NULL)
+		{
+			//cout<<bias<<endl;
+			//cout<<tar_dif<<endl;
+			ob.next_orbit()->print();
+			printf("error");
+			return false;
+		}
+		a0.next_orbit()->b_parameter(bt0,br0);
+
+		orbit a1;
+		a1.reset_orbit(s0.r,s0.v+dv+dx*dif,s0.t,s0.body);
+		if(a1.next_orbit()==NULL)
+		{
+			cout<<bias<<endl;
+			cout<<tar_dif<<endl;
+			printf("error");
+			return false;
+		}
+		a1.next_orbit()->b_parameter(bt1,br1);
+
+		orbit a2;
+		a2.reset_orbit(s0.r,s0.v+dv+dy*dif,s0.t,s0.body);
+		if(a2.next_orbit()==NULL)
+		{
+			cout<<bias<<endl;
+			cout<<tar_dif<<endl;
+			printf("error");
+			return false;
+		}
+		a2.next_orbit()->b_parameter(bt2,br2);
+
+
+		mdif[0][0]=(bt1-bt0)/dif;
+		mdif[1][0]=(br1-br0)/dif;
+		mdif[0][1]=(bt2-bt0)/dif;
+		mdif[1][1]=(br2-br0)/dif;
+		//cout<<mdif;
+
+		//double next_sem=a.next_orbit()->semimajor_axis();
+		double next_ecc=a0.next_orbit()->eccentric();
+		if(next_ecc<1.0)
+		{
+			printf("\n ecc<1.0\n");
+			return false;
+		}
+		double a = a0.conic_a();
+		double b = a0.conic_b();
+		double theta = atan(b / a);
+		double cos_w_theta = cos(theta + a0.next_orbit()->argument_of_perigee());
+		double tar_b=-pe*pow((next_ecc+1)/(next_ecc-1),0.5);
+		//if (bt0>0)
+		//	tar_b=-tar_b;
+		
+		tar_dif[0][0]=-bt0;
+		tar_dif[1][0]=(tar_b-br0);
+		//cout<<"next_ecc"<<next_ecc<<endl;
+		mdif=mdif.inverse();
+		//cout<<mdif;
+
+		bias=mdif*tar_dif;
+		//cout<<bias<<endl;
+		double dx_bias=bias[0][0];
+		double dy_bias=bias[1][0];
+		//(dx_bias,dy_bias,0.1);
+
+		dv=dv+dx_bias*dx;
+		dv=dv+dy_bias*dy;;
+
+	}
+	orbit ret;
+	ret.reset_orbit(s0.r,s0.v+dv,s0.t,s0.body);
+	//ret.print();
+	if(ret.next_orbit()==NULL)
+		return false;
+	ret.next_orbit()->print();
+	auto dis=dv.magnitude();
+	printf("dv:%lf\n",dis);
+	return true;
+}
+
 
 void PrintVector(Vector3 vec)
 {
@@ -282,9 +388,9 @@ void test2()
 {
 	double lon=1.936535765863177;
 	double lat=0.3423248200098106;
-	double lan=0.04008351366616158;//ÔÂÇòÉı½»µã
+	double lan=0.04008351366616158;//æœˆçƒå‡äº¤ç‚¹
 	bodies::instance();
-	for(double i=0;i<160;i=i+1)
+	for(double i=0;i<100;i=i+1)
 	{
 		orbit init;
 		orbit trans;
@@ -318,7 +424,11 @@ void test2()
 						{
 							double pe_dis=trans1.next_orbit()->periapsis().magnitude()-1737100;
 							printf("\nt0:%lf slt:%lf lan:%lf pe:%lf\n",toDay(init.t0()),slt,degrees(trans1.longitude_of_ascend_node()),pe_dis);
+
+							Vector3 dv;
+							correct_orbit(trans1,trans1.t0()+10,dv);
 						}
+
 						//ret.next_orbit()->print();
 					}
 				};
