@@ -1,3 +1,4 @@
+//#define PY_BUILD
 #include "orbit.h"
 #include "config.h"
 #include <queue>
@@ -149,6 +150,13 @@ double t_to_capture(const orbit&obt,const double &ut,std::string &new_body)
 	for(int i=0;i<body.satellites.size();i++)
 	{
 		celestial_body satelite=bodies::instance()[body.satellites[i]];
+
+		if(satelite.orbit.periapsis().magnitude()-satelite.soi>obt.apoapsis().magnitude()
+			||satelite.orbit.apoapsis().magnitude()+satelite.soi<obt.periapsis().magnitude())
+		{
+			continue;
+		}
+
 		double t_closest;
 		double dis_closest=closest_distance(obt,satelite.orbit,ut,&t_closest);
 		if(t_closest<ut)
@@ -250,7 +258,7 @@ orbit::orbit()
 	Vector3 m_Pe=Vector3(0.0,0.0,0.0);
 	m_Next=NULL;
 }
-/*
+
 orbit::orbit(const orbit & ob)
 {
 	m_Next=NULL;
@@ -264,7 +272,7 @@ orbit::orbit(const orbit && ob)
 	m_Body="";
 	(*this)=ob;
 }
-*/
+
 
 orbit::orbit(Vector3 r, Vector3 v, double t, double gm)
 {
@@ -308,6 +316,7 @@ orbit&orbit::operator=(const orbit &ob)
 		m_Aop=ob.m_Aop;
 		m_T0=ob.m_T0;
 		m_M0=ob.m_M0;
+		m_period=ob.m_period;
 		m_t_next =ob.m_t_next;
 		m_H= ob.m_H;
 		m_Pe=ob.m_Pe;
@@ -438,7 +447,7 @@ void orbit::reset_orbit(Vector3 r, Vector3 v, double t, double gm)
 	}
 
 	m_Lan = Vector3::Angle(vlan, x);
-	if (Vector3::Dot(m_H, y) > 0.0)
+	if (Vector3::Dot(y, Vector3::Cross(vlan , x)) < 0.0)
 	{
 		m_Lan = -m_Lan;
 	}
@@ -472,6 +481,18 @@ Vector3 orbit::position_at_f(double f)const
 	return Quaternion(m_H, f).rotate(m_Pe).normalized() * F_to_R(m_Ecc, m_Sem, f);
 }
 
+double orbit::f_at_position(Vector3 pos)const
+{
+	Vector3 normal=m_H.normalized();
+	pos=pos-normal*Vector3::Dot(normal,pos);
+	double ret=Vector3::Angle(pos,m_Pe);
+	if(Vector3::Dot(Vector3::Cross(pos,m_Pe),normal)>0)
+	{
+		ret=-ret;
+	}
+	return ret;
+}
+
 double orbit::f_at_t(double t)const
 {
 	double n = pow(fabs(m_Gm / (m_Sem*m_Sem*m_Sem)), 0.5);
@@ -498,6 +519,8 @@ double orbit::t_to_f(double t0,double f)const
 	double M=E_to_M(m_Ecc,E);
 	double n = pow(fabs(m_Gm / (m_Sem*m_Sem*m_Sem)), 0.5);
 	double t = (M-m_M0)/n-t0;
+	if(t<0)
+		t+=m_period;
 	return t;
 }
 
@@ -578,6 +601,11 @@ Vector3 orbit::periapsis()const
 	return m_Pe;
 }
 
+Vector3 orbit::h()const
+{
+	return m_H;
+}
+
 Vector3 orbit::angular_momentum()const
 {
 	return m_H;
@@ -615,6 +643,11 @@ double orbit::gravity_parameter()const
 double orbit::mean_anomaly0()const
 {
 	return m_M0;
+}
+
+double orbit::t0()const
+{
+	return m_T0;
 }
 
 double orbit::conic_a()const

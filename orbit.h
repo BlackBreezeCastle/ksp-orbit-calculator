@@ -2,7 +2,11 @@
 #include<string>
 #include<vector>
 #include<map>
+#ifndef PY_BUILD
 #include"kepler.h"
+#else
+#include"kepler.cpp"
+#endif
 struct state
 {
 	Vector3 r;
@@ -50,9 +54,9 @@ private:
 public:
 	orbit();
 
-	//orbit(const orbit & ob);
+	orbit(const orbit & ob);
 
-	//orbit(const orbit &&ob);
+	orbit(const orbit &&ob);
 
 	orbit(Vector3 r, Vector3 v, double t, double gm);
 
@@ -76,6 +80,8 @@ public:
 	Vector3 position_at_t(double t)const;
 
 	Vector3 position_at_f(double f)const;
+
+	double f_at_position(Vector3 pos)const;
 
 	double f_at_t(double t)const;
 
@@ -105,6 +111,8 @@ public:
 
 	Vector3 periapsis()const; 
 
+	Vector3 h()const;
+
 	Vector3 angular_momentum()const;
 
 	double eccentric()const;
@@ -120,6 +128,8 @@ public:
 	double gravity_parameter()const;
 
 	double mean_anomaly0()const;
+
+	double t0()const;
 
 	double conic_a()const;
 	
@@ -156,6 +166,21 @@ struct celestial_body
 		rotate_speed = 0.0;
 		name = ""; 
 		parent = "";
+	}
+
+	Vector3 msl_position(const double &lon,
+					 const double &lat,
+					 const double &alt,
+					 const double &t)
+	{
+		double r=lat+radius;
+		double coslat=cos(lat);
+		double x=cos(lon)*coslat*r;
+		double z=sin(lon)*coslat*r;
+		double y=sin(lat)*r;
+		Vector3 ret= Vector3(x,y,z);
+		ret=Quaternion(Vector3(0,1,0),-(rotate_speed*t+init_rotation)).rotate(ret);
+		return ret;
 	}
 	/*
 	celestial_body(const celestial_body&&b)
