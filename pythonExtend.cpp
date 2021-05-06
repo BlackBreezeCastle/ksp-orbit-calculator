@@ -1,6 +1,6 @@
 #include <Python.h>
 #include "structmember.h"
-//#include "orbit.h"
+#define PY_BUILD
 #include "orbit.cpp"
 
 typedef struct _OrbitObject
