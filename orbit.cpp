@@ -486,7 +486,7 @@ double orbit::f_at_position(Vector3 pos)const
 	Vector3 normal=m_H.normalized();
 	pos=pos-normal*Vector3::Dot(normal,pos);
 	double ret=Vector3::Angle(pos,m_Pe);
-	if(Vector3::Dot(Vector3::Cross(pos,m_Pe),normal)>0)
+	if(Vector3::Dot(Vector3::Cross(m_Pe,pos),normal)<0)
 	{
 		ret=-ret;
 	}
@@ -519,8 +519,12 @@ double orbit::t_to_f(double t0,double f)const
 	double M=E_to_M(m_Ecc,E);
 	double n = pow(fabs(m_Gm / (m_Sem*m_Sem*m_Sem)), 0.5);
 	double t = (M-m_M0)/n-t0;
+	t=fmod(t,m_period);
 	if(t<0)
+	{
 		t+=m_period;
+	}
+	//printf("\n t0:%lf,f:%lf,E:%lf,M:%lf,n:%lf,t%lf,M0:%lf\n",t0,f,E,M,n,t,m_M0);
 	return t;
 }
 
@@ -578,7 +582,7 @@ state orbit::state_at_f(double F)const
 void orbit::print()const
 {
 	printf("\n Body:%s\n Gm:%lf\n m_Ecc:%.17lf \n m_Sem:%.17lf \n m_Inc:%.17lf \n m_Lan:%.17lf \n m_Aop:%.17lf \n m_M0 %.17lf \n pe: %.17lf\n",
-		m_Body.c_str(), m_Gm, m_Ecc, m_Sem, m_Inc * 180 / PI, m_Lan * 180 / PI, m_Aop * 180 / PI, m_M0, m_Pe.magnitude());
+		m_Body.c_str(), m_Gm, m_Ecc, m_Sem, m_Inc * 180 / PI, m_Lan * 180 / PI, m_Aop * 180 / PI, m_M0, m_Pe.magnitude()-bodies::instance()[m_Body].radius);
 }
 
 std::string orbit::body()const
