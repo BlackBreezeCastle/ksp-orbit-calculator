@@ -1,22 +1,34 @@
 import Korbit
 from Kmath import *
-ob=Korbit.orbit()
-#print(ob.__instance)
+import krpc
 
-def f_at_orbit(r,orb):
-    h=Vector3.Tuple3(orb.h()).unit_vector()
-    r=Vector3.Tuple3(r)
-    r=r-Vector3.Dot(r,h)*h
-    pe=Vector3.Tuple3(orb.pe_vector())
-    print(pe)
-    print(r)
-    ret=Vector3.Angle(pe,r)
-    if Vector3.Dot(Vector3.Cross(r,pe),h)>0:
-        ret=-ret
-    print(math.degrees(ret))
 
 r0=6371000
 h=400000
-ob.set_r_v((0.0,r0+h,0.0),(7900.0,0.0,0.0),0.0,398600446148608.0)
-print(ob.period())
-f_at_orbit((1,1,0),ob)
+
+ob1=Korbit.orbit()
+
+ap=400000+r0
+pe=150000+r0
+sem=0.5*(ap+pe)
+ecc=(ap-pe)/(ap+pe)
+gm=398600446148608.0
+ob1.set_element(sem,ecc,0,0,0,0,0,gm)
+print(ob1.state_at_t(0))
+print(ob1.state_at_f(0))
+ob2=Korbit.orbit()
+
+sem=r0+h
+ob2.set_element(sem,0,0,0,0,0,0,gm)
+period1=ob1.period()
+angle=0
+for i in range(1000):
+    tmp=ob1.f_at_position(ob2.state_at_t(period1*i)[0])
+    #print(tmp)
+    if tmp<0 and angle>0:
+        print((i,i*period1/86400,math.degrees(angle)))
+        dock_pos=ob1.state_at_f(math.pi)[0]
+        tf=ob2.t_to_f(i*period1,ob2.f_at_position(dock_pos))
+        print(tf)
+    angle=tmp
+
