@@ -15,6 +15,16 @@ double normalized_rad(double rad)
 	return rad;
 }
 
+double radians(double x)
+{
+	return x*PI/180;
+}
+
+double degrees(double x)
+{
+	return x*180/PI;
+}
+
 Vector3::Vector3(void)
 {
 	m_x = 0.0;

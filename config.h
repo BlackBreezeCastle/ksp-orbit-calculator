@@ -16,6 +16,8 @@ private:
 		fopen_s(&fp, FileName.c_str(), "rb");
 		if (NULL == fp)
 		{
+			printf("\nunable to open file ");
+			printf("%s\n",FileName.c_str());
 			return false;
 		}
 		fseek(fp, 0L, SEEK_END);

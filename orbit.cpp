@@ -581,8 +581,8 @@ state orbit::state_at_f(double F)const
 
 void orbit::print()const
 {
-	printf("\n Body:%s\n Gm:%lf\n m_Ecc:%.17lf \n m_Sem:%.17lf \n m_Inc:%.17lf \n m_Lan:%.17lf \n m_Aop:%.17lf \n m_M0 %.17lf \n pe: %.17lf\n",
-		m_Body.c_str(), m_Gm, m_Ecc, m_Sem, m_Inc * 180 / PI, m_Lan * 180 / PI, m_Aop * 180 / PI, m_M0, m_Pe.magnitude()-bodies::instance()[m_Body].radius);
+	printf("\n Body:%s\n Gm:%lf\n m_Ecc:%.17lf \n m_Sem:%.17lf \n m_Inc:%.17lf \n m_Lan:%.17lf \n m_Aop:%.17lf \n m_M0 %.17lf \n pe: %.17lf\n ap: %.17lf\n",
+		m_Body.c_str(), m_Gm, m_Ecc, m_Sem, m_Inc * 180 / PI, m_Lan * 180 / PI, m_Aop * 180 / PI, m_M0, m_Pe.magnitude()-bodies::instance()[m_Body].radius,m_Ap.magnitude()-bodies::instance()[m_Body].radius);
 }
 
 std::string orbit::body()const

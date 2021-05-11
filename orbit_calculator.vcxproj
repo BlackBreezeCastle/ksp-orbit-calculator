@@ -80,12 +80,14 @@
     <ClInclude Include="json.h" />
     <ClInclude Include="kepler.h" />
     <ClInclude Include="kmath.h" />
+    <ClInclude Include="navigation.h" />
     <ClInclude Include="orbit.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="json.cpp" />
     <ClCompile Include="kepler.cpp" />
     <ClCompile Include="kmath.cpp" />
+    <ClCompile Include="navigation.cpp" />
     <ClCompile Include="orbit.cpp" />
     <ClCompile Include="test.cpp" />
   </ItemGroup>

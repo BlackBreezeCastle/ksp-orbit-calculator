@@ -1,7 +1,7 @@
 #include <Python.h>
 #include "structmember.h"
 #define PY_BUILD
-#include "orbit.cpp"
+#include "navigation.cpp"
 
 typedef struct _OrbitObject
 {
@@ -9,7 +9,7 @@ typedef struct _OrbitObject
     orbit __instance;
 } OrbitObject;
 
-static PyMemberDef OrbitObject_DataMembers[] = {  //ç±»/ç»“æ„çš„æ•°æ®æˆå‘˜ç±»è¯´æ˜ è¡¨.   æ ¹æ®å®˜æ–¹æ–‡æ¡£è¯´æ˜æ­¤ç±»è¡¨å¿…é¡»è¦è¦ä»¥ä¸€ä¸ªå…ƒç´ å…¨ä¸ºNULLçš„æ•°æ®ç»“æ„ç»“å°¾ï¼Œåé¢è¿˜æœ‰ä¸€ä¸ªMethod è¡¨ä¹Ÿæ˜¯å¦‚æ­¤
+static PyMemberDef OrbitObject_DataMembers[] = {  //Àà/½á¹¹µÄÊı¾İ³ÉÔ±ÀàËµÃ÷ ±í.   ¸ù¾İ¹Ù·½ÎÄµµËµÃ÷´ËÀà±í±ØĞëÒªÒªÒÔÒ»¸öÔªËØÈ«ÎªNULLµÄÊı¾İ½á¹¹½áÎ²£¬ºóÃæ»¹ÓĞÒ»¸öMethod ±íÒ²ÊÇÈç´Ë
      { "__instance", T_OBJECT, offsetof(OrbitObject, __instance), 0, "The instance of orbit" },
      { NULL, NULL, NULL, 0, NULL }   
  };
@@ -25,15 +25,15 @@ OrbitObejct_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     return (PyObject *) self;
 }
  
- static void OrbitObejct_init(OrbitObject* Self, PyObject* pArgs)        //æ„é€ æ–¹æ³•.
+ static void OrbitObejct_init(OrbitObject* Self, PyObject* pArgs)        //¹¹Ôì·½·¨.
  {
 	 Self->__instance=orbit();
  }
  
  
- static void  OrbitObejct_Destruct(OrbitObject* Self)                   //ææ„æ–¹æ³•.
+ static void  OrbitObejct_Destruct(OrbitObject* Self)                   //Îö¹¹·½·¨.
  {
-     Py_TYPE(Self)->tp_free((PyObject*)Self);                //é‡Šæ”¾å¯¹è±¡/å®ä¾‹.
+     Py_TYPE(Self)->tp_free((PyObject*)Self);                //ÊÍ·Å¶ÔÏó/ÊµÀı.
  }
 
 static PyObject *set_r_v(OrbitObject *self, PyObject *args) {
@@ -47,6 +47,23 @@ static PyObject *set_r_v(OrbitObject *self, PyObject *args) {
 	}
 
 	self->__instance.reset_orbit(Vector3(x0, y0, z0), Vector3(vx0, vy0, vz0), t, gm);
+	//self->__instance.print();
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+static PyObject *set_r_v_t_body(OrbitObject *self, PyObject *args) {
+	double x0, y0, z0;
+	double vx0, vy0, vz0; 
+	double t;
+    char *body;
+
+	// Parse arguments
+	if (!PyArg_ParseTuple(args, "(ddd)(ddd)ds", &x0,&y0,&z0,&vx0,&vy0,&vz0,&t,&body)) {
+		return NULL;
+	}
+    //printf("%s",body);
+	self->__instance.reset_orbit(Vector3(x0, y0, z0), Vector3(vx0, vy0, vz0), t, std::string(body));
 	//self->__instance.print();
 	Py_INCREF(Py_None);
 	return Py_None;
@@ -99,6 +116,13 @@ static PyObject *period(OrbitObject *self, PyObject *args) {
 	return pyRet;
 }
 
+static PyObject *print(OrbitObject *self, PyObject *args) {
+
+	self->__instance.print();
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyObject *state_at_f(OrbitObject *self, PyObject *args) {
 	double f;
 	// Parse arguments
@@ -111,19 +135,60 @@ static PyObject *state_at_f(OrbitObject *self, PyObject *args) {
 	return pyRet;
 }
 
+static PyObject *t_to_f(OrbitObject *self, PyObject *args) {
+	double t0,f;
+	// Parse arguments
+	if (!PyArg_ParseTuple(args, "dd", &t0,&f)) {
+		return NULL;
+	}
+
+	double ret = self->__instance.t_to_f(t0,f);
+	PyObject* pyRet= Py_BuildValue("d", ret);
+	return pyRet;
+}  
+ 
+static PyObject *f_at_position(OrbitObject *self, PyObject *args) {
+	double x0, y0, z0;
+
+	// Parse arguments
+	if (!PyArg_ParseTuple(args, "(ddd)", &x0,&y0,&z0)) {
+		return NULL;
+	}
+    
+	double f=self->__instance.f_at_position(Vector3(x0, y0, z0));
+	PyObject* pyRet= Py_BuildValue("d", f);
+	return pyRet;
+}
+  
 static PyMethodDef orbit_methods[] = {
     {"set_r_v", (PyCFunction) set_r_v,METH_VARARGS,
      "set orbit by position and velocity,parameter:r,v,t,gm"
     },
+    
+    {"set_r_v_t_body", (PyCFunction) set_r_v_t_body,METH_VARARGS,
+     "set orbit by position and velocity at t when in body,parameter:r,v,t,body(string)"
+    },
+    
     {"set_element", (PyCFunction) set_element,METH_VARARGS,
      "set orbit by element parameter:sem,ecc,inc,lan,aop,m0,t0,gm"
     },
+    
 	{"state_at_t", (PyCFunction) state_at_t,METH_VARARGS,
      "return the position and velocity at time t,parameter:t,return ((r)(v))"
     },
+	
+	{"f_at_position", (PyCFunction) f_at_position,METH_VARARGS,
+     "return the true anomaly f at the input position,parameter:(x,y,z)"
+    },
+	
 	{"state_at_f", (PyCFunction) state_at_f,METH_VARARGS,
      "return the position and velocity at true anomaly,parameter:f,return ((r)(v))"
     },
+    
+	{"t_to_f", (PyCFunction) t_to_f,METH_VARARGS,
+     "return the time from t0 to desired true anomaly,parameter:t0,f,return time"
+    },
+    
 	{"pe_vector", (PyCFunction) pe_vector,METH_NOARGS,
      "return vector of periapsis"
     },
@@ -134,32 +199,36 @@ static PyMethodDef orbit_methods[] = {
 	{"period", (PyCFunction) period,METH_NOARGS,
      "return vector of angular momentum when mass is 1kg"
     },
+
+	{"print", (PyCFunction) print,METH_NOARGS,
+     "print orbit info"
+    },
     { NULL} /* Sentinel */
 };
 
 static PyTypeObject OrbitObject_ClassInfo =
 {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "Korbit.orbit",            //å¯ä»¥é€šè¿‡__class__è·å¾—è¿™ä¸ªå­—ç¬¦ä¸². CPPå¯ä»¥ç”¨ç±».__name__è·å–.   const char *
-    sizeof(OrbitObject),                 // tp_basicsize ç±»/ç»“æ„çš„é•¿åº¦.è°ƒç”¨PyObject_Newæ—¶éœ€è¦çŸ¥é“å…¶å¤§å°.  Py_ssize_t
+    "Korbit.orbit",            //¿ÉÒÔÍ¨¹ı__class__»ñµÃÕâ¸ö×Ö·û´®. CPP¿ÉÒÔÓÃÀà.__name__»ñÈ¡.   const char *
+    sizeof(OrbitObject),                 // tp_basicsize Àà/½á¹¹µÄ³¤¶È.µ÷ÓÃPyObject_NewÊ±ĞèÒªÖªµÀÆä´óĞ¡.  Py_ssize_t
     0,                              //tp_itemsize  Py_ssize_t
-    (destructor)OrbitObejct_Destruct,    //ç±»çš„ææ„å‡½æ•°.      destructor
-    0,                            //ç±»çš„print å‡½æ•°      printfunc
-    0,                               //ç±»çš„getattr å‡½æ•°  getattrfunc
-    0,                              //ç±»çš„setattr å‡½æ•°   setattrfunc
+    (destructor)OrbitObejct_Destruct,    //ÀàµÄÎö¹¹º¯Êı.      destructor
+    0,                            //ÀàµÄprint º¯Êı      printfunc
+    0,                               //ÀàµÄgetattr º¯Êı  getattrfunc
+    0,                              //ÀàµÄsetattr º¯Êı   setattrfunc
     0,                              //formerly known as tp_compare(Python 2) or tp_reserved (Python 3)  PyAsyncMethods *
-    0,          //tp_repr å†…ç½®å‡½æ•°è°ƒç”¨ã€‚    reprfunc
-    0,                              //tp_as_number   æŒ‡é’ˆ   PyNumberMethods *
-    0,                              //tp_as_sequence æŒ‡é’ˆ   PySequenceMethods *
-    0,                              // tp_as_mapping æŒ‡é’ˆ  PyMappingMethods *
+    0,          //tp_repr ÄÚÖÃº¯Êıµ÷ÓÃ¡£    reprfunc
+    0,                              //tp_as_number   Ö¸Õë   PyNumberMethods *
+    0,                              //tp_as_sequence Ö¸Õë   PySequenceMethods *
+    0,                              // tp_as_mapping Ö¸Õë  PyMappingMethods *
     0,                              // tp_hash   hashfunc
     0,                              //tp_call     ternaryfunc
-    0,          //tp_str/printå†…ç½®å‡½æ•°è°ƒç”¨.   reprfunc
+    0,          //tp_str/printÄÚÖÃº¯Êıµ÷ÓÃ.   reprfunc
     0,                          //tp_getattro    getattrofunc
     0,                          //tp_setattro     setattrofunc
-    0,                          //tp_as_buffer æŒ‡é’ˆ Functions to access object as input/output buffer   PyBufferProcs
-    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,                 //tp_flags    å¦‚æœæ²¡æœ‰æä¾›æ–¹æ³•çš„è¯ï¼Œä¸ºPy_TPFLAGS_DEFAULE     unsigned long
-    "Korbit Module write by C++!",                   // tp_doc  __doc__,ç±»/ç»“æ„çš„DocString.  const char *
+    0,                          //tp_as_buffer Ö¸Õë Functions to access object as input/output buffer   PyBufferProcs
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,                 //tp_flags    Èç¹ûÃ»ÓĞÌá¹©·½·¨µÄ»°£¬ÎªPy_TPFLAGS_DEFAULE     unsigned long
+    "Korbit Module write by C++!",                   // tp_doc  __doc__,Àà/½á¹¹µÄDocString.  const char *
     0,                                                   //tp_traverse    call function for all accessible objects    traverseproc
     0,                                                      // tp_clear   delete references to contained objects    inquiry
     0,                                                      //  tp_richcompare   richcmpfunc
@@ -170,33 +239,60 @@ static PyTypeObject OrbitObject_ClassInfo =
 
     /* Attribute descriptor and subclassing stuff */
 
-    orbit_methods,        //ç±»çš„æ‰€æœ‰æ–¹æ³•é›†åˆ.   PyMethodDef *
-    OrbitObject_DataMembers,          //ç±»çš„æ‰€æœ‰æ•°æ®æˆå‘˜é›†åˆ.  PyMemberDef *
+    orbit_methods,        //ÀàµÄËùÓĞ·½·¨¼¯ºÏ.   PyMethodDef *
+    OrbitObject_DataMembers,          //ÀàµÄËùÓĞÊı¾İ³ÉÔ±¼¯ºÏ.  PyMemberDef *
     0,                                              // tp_getset   PyGetSetDef *
     0,                                              //  tp_base   _typeobject *
     0,                                              //  tp_dict     PyObject *
     0,                                              // tp_descr_get   descrgetfunc
     0,                                                          //tp_descr_set   descrsetfunc
     0,                                              //tp_dictoffset   Py_ssize_t
-    (initproc)OrbitObejct_init,      //ç±»çš„æ„é€ å‡½æ•°.tp_init       initproc
+    (initproc)OrbitObejct_init,      //ÀàµÄ¹¹Ôìº¯Êı.tp_init       initproc
     0,                      //tp_alloc  allocfunc
     OrbitObejct_new,                          //tp_new   newfunc
     0,                        // tp_free    freefunc
     0,                      //  tp_is_gc     inquiry
 };
 
+static PyObject* polar_orbit_transfer_correct(PyObject* self, PyObject*args)
+{
+    double rx,ry,rz,vx,vy,vz;
+    char *body;
+    double target_pe;
+    double t,maneuver_t;
+    if(!PyArg_ParseTuple(args, "(ddd)(ddd)dsdd", &rx,&ry,&rz,&vx,&vy,&vz,&t,&body,&target_pe,maneuver_t))
+    {
+        return NULL;
+    }
+    Vector3 r(rx,ry,rz);
+    Vector3 v(vx,vy,vz);
+    Vector3 dv;
+    bool ok=polar_orbit_transfer_correct(r,v,t,body,target_pe,maneuver_t,dv);
+    if(ok)
+    {
+        return Py_BuildValue("(ddd)", dv.x(),dv.y(),dv.z());
+    }
+    Py_INCREF(Py_None);
+    return Py_None;
+}
 
+static PyMethodDef navigation_methods[] =
+{
+    {"polar_orbit_transfer_correct", (PyCFunction)polar_orbit_transfer_correct
+    , METH_VARARGS, "count the correct dv in polar transfer orbit"},
+    {NULL, NULL, 0, NULL}
+};
 
 static PyModuleDef ModuleInfo =
 {
 	PyModuleDef_HEAD_INIT,
-	"Korbit",               //æ¨¡å—çš„å†…ç½®å--__name__.
-	NULL,                 //æ¨¡å—çš„DocString.__doc__
+	"Korbit",               //Ä£¿éµÄÄÚÖÃÃû--__name__.
+	NULL,                 //Ä£¿éµÄDocString.__doc__
 	-1,
-	NULL, NULL, NULL, NULL, NULL
+	navigation_methods, NULL, NULL, NULL, NULL
 };
 
-PyMODINIT_FUNC PyInit_Korbit(void)       //æ¨¡å—å¤–éƒ¨åç§°ä¸º--PyVcam
+PyMODINIT_FUNC PyInit_Korbit(void)       //Ä£¿éÍâ²¿Ãû³ÆÎª--PyVcam
 {
 	if (PyType_Ready(&OrbitObject_ClassInfo) < 0)
         return NULL;
@@ -205,7 +301,6 @@ PyMODINIT_FUNC PyInit_Korbit(void)       //æ¨¡å—å¤–éƒ¨åç§°ä¸º--PyVcam
     if (pReturn == NULL)
         return NULL;
     Py_INCREF(&OrbitObject_ClassInfo);
-    PyModule_AddObject(pReturn, "orbit", (PyObject*)&OrbitObject_ClassInfo); //å°†è¿™ä¸ªç±»åŠ å…¥åˆ°æ¨¡å—çš„Dictionaryä¸­.
-
+    PyModule_AddObject(pReturn, "orbit", (PyObject*)&OrbitObject_ClassInfo); //½«Õâ¸öÀà¼ÓÈëµ½Ä£¿éµÄDictionaryÖĞ.
     return pReturn;
 }

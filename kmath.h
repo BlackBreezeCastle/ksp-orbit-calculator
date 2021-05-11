@@ -12,6 +12,11 @@ double normalized_angle(double angle);
 
 double normalized_rad(double rad);
 
+double radians(double x);
+
+
+double degrees(double x);
+
 //ÈıÎ¬ÏòÁ¿
 class _declspec(dllexport) Vector3
 {
