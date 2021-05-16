@@ -228,7 +228,6 @@ bool transfer_orbit(const orbit &ob,orbit &ret,double pe)
 
 	}
 	ret.reset_orbit(sem,ecc,inc,lan,aop,m0+m_offset(lan,aop),t0-m_offset(lan,aop)*period*0.5/PI,body);
-	//ret.print();
 	if(ret.next_orbit()==NULL)
 		return false;
 	return true;
@@ -327,7 +326,7 @@ bool correct_orbit(const orbit &ob,
 	}
 	orbit ret;
 	ret.reset_orbit(s0.r,s0.v+dv,s0.t,s0.body);
-	//ret.print();
+	ret.print();
 	if(ret.next_orbit()==NULL)
 		return false;
 	//ret.next_orbit()->print();
@@ -352,5 +351,5 @@ bool polar_orbit_transfer_correct(Vector3 r,
 {
 	orbit init;
 	init.reset_orbit(r,v,t,body);
-	correct_orbit(init,maneuver_t,dv,target_pe);
+	return correct_orbit(init,maneuver_t,dv,target_pe);
 }

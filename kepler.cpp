@@ -74,7 +74,7 @@ double eps3(double ecc, double M, double x)
 	//printf("Îó²î%.40f",E_error);
 	return E_error;
 }
-
+/*
 double E_to_F(double ecc,double E)
 {
 	if (ecc < 1.0)
@@ -85,8 +85,20 @@ double E_to_F(double ecc,double E)
 	{
 		return 2.0*atan(pow((1.0 + ecc) / (ecc - 1.0), 0.5)*tanh(0.5*E));
 	}
+}*/
+
+double E2Fstd(double ecc, double E)
+{
+	return 2.0*atan(pow((1.0 + ecc) / (1.0 - ecc), 0.5)*tan(0.5*E));
 }
 
+double E2Fhyp(double ecc, double E)
+{
+	return 2.0*atan(pow((1.0 + ecc) / (ecc - 1.0), 0.5)*tanh(0.5*E));
+}
+
+
+/*
 double F_to_E(double ecc, double F)
 {
 	if (ecc < 1.0)
@@ -98,7 +110,17 @@ double F_to_E(double ecc, double F)
 		return 2.0* atanh(pow((ecc - 1.0) / (1.0 + ecc), 0.5)*tan(0.5*F));
 	}
 }
+*/
 
+double F2Estd(double ecc, double F)
+{
+	return 2.0*atan(pow((1.0 - ecc) / (1.0 + ecc), 0.5)*tan(0.5*F));
+}
+
+double F2Ehyp(double ecc, double F)
+{
+	return 2.0* atanh(pow((ecc - 1.0) / (1.0 + ecc), 0.5)*tan(0.5*F));
+}
 
 /* ---------------------------------------------------------------------
 **
@@ -110,7 +132,7 @@ double F_to_E(double ecc, double F)
 ** ·µ»ØÖµ  : E   -> Æ«½ü½Ç [rad]
 **
 ** ---------------------------------------------------------------------*/
-double kepler_E(double ecc, double M)
+double M2Estd(double ecc, double M)
 {
 
 	double E0, dE, E, Mnorm;
@@ -149,7 +171,7 @@ double kepler_E(double ecc, double M)
 	return E;
 }
 
-double kepler_H(double e, double M)
+double M2Ehyp(double e, double M)
 {
 	double H = 2.0 * M / e;
     H = log(sqrt(H * H + 1.0) + H);
@@ -161,7 +183,7 @@ double kepler_H(double e, double M)
 	}
 	return H;
 }
-
+/*
 double M_to_E(double ecc, double M)
 {
 	if (ecc > 1.0)
@@ -173,6 +195,7 @@ double M_to_E(double ecc, double M)
 		return kepler_E(ecc, M);
 	}
 }
+*/
 
 
 double F_to_R(double ecc, double sem, double f)
@@ -184,7 +207,7 @@ double R_to_F(double ecc, double sem, double r)
 {
 	return acos(std::min(std::max((sem*(1-ecc*ecc)/r - 1.0) / ecc, -1.0 ), 1.0));
 }
-
+/*
 double E_to_M(double ecc, double E)
 {
 	if (ecc > 1.0)
@@ -195,4 +218,14 @@ double E_to_M(double ecc, double E)
 	{
 		return E - sin(E)*ecc;
 	}
+}
+*/
+double E2Mstd(double ecc, double E)
+{
+	return sinh(E)*ecc - E;
+}
+
+double E2Mhyp(double ecc, double E)
+{
+	return E - sin(E)*ecc;
 }

@@ -70,6 +70,8 @@ public:
 
 	void reset_orbit(double sem,double ecc,double inc,double lan,double aop,double m0,double t0,double gm);
 
+	void reset_rss_orbit(double sem,double ecc,double inc,double lan,double aop,double m0,double t0,double gm,double period);//应对ro-ksp 异常周期
+
 	void reset_orbit(double sem,double ecc,double inc,double lan,double aop,double m0,double t0,std::string body,const int &round =2);
 
 	orbit& operator =(const orbit &ob);

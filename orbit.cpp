@@ -59,15 +59,36 @@ double closest_distance(const orbit &a, const orbit &b, double start_time,double
 	double ret=0.0;
 	double min_period;
 	double max_period;
-	if(a.period() < b.period())
+	double a_period;
+	double b_period;
+	if(a.eccentric()>1)
 	{
-		min_period=a.period();
-		max_period=b.period();
+		a_period=INFINITY_DOUBLE;
 	}
 	else
 	{
-		min_period=b.period();
-		max_period=a.period();		
+		a_period=a.period();
+	}
+
+	if(b.eccentric()>1)
+	{
+		b_period=INFINITY_DOUBLE;
+	}
+	else
+	{
+		b_period=b.period();
+	}
+
+
+	if(a_period < b_period)
+	{
+		min_period=a_period;
+		max_period=b_period;
+	}
+	else
+	{
+		min_period=b_period;
+		max_period=a_period;
 	}
 	
 	double closest_dis=INFINITY_DOUBLE;
@@ -358,7 +379,7 @@ void orbit::reset_orbit(double sem,double ecc,double inc,double lan,double aop,d
 	m_T0=t0;
 	m_M0=m0;
 	//count the period
-	m_period = 2 * PI*pow((pow(m_Sem,3) /m_Gm),0.5);
+	m_period = 2 * PI*pow(fabs((m_Sem*m_Sem*m_Sem/m_Gm)), 0.5);
 
 	//
 	Vector3 y = Vector3(0.0, 1.0, 0.0);
@@ -379,8 +400,12 @@ void orbit::reset_orbit(double sem,double ecc,double inc,double lan,double aop,d
 	m_Pe=Quaternion(m_H,m_Aop).rotate(m_Pe);
 	m_Ap=-1.0*m_Sem*(1+m_Ecc)*m_Pe;
 	m_Pe=m_Pe*pe;
+}
 
-	double n = pow(fabs(m_Gm / (m_Sem*m_Sem*m_Sem)), 0.5);
+void orbit::reset_rss_orbit(double sem,double ecc,double inc,double lan,double aop,double m0,double t0,double gm,double period)
+{
+	reset_orbit(sem,ecc,inc,lan,aop,m0,t0,gm);
+	m_period=period;
 }
 
 void orbit::reset_orbit(double sem,double ecc,double inc,double lan,double aop,double m0,double t0,std::string body,const int &round)
@@ -410,14 +435,8 @@ void orbit::reset_orbit(Vector3 r, Vector3 v, double t, double gm)
 		m_Ecc = pow(max(1 -h2/ (m_Gm*m_Sem),0.0), 0.5);
 	}
 
-	if (m_Sem > 0)
-	{
-		m_period = 2 * PI*pow((pow(m_Sem, 3) / m_Gm), 0.5);
-	}
-	else
-	{
-		m_period = -1.0;
-	}
+	//count the period
+	m_period = 2 * PI*pow(fabs((m_Sem*m_Sem*m_Sem/m_Gm)), 0.5);
 
 
 	if(m_Ecc!=0.0)
@@ -459,8 +478,20 @@ void orbit::reset_orbit(Vector3 r, Vector3 v, double t, double gm)
 		m_Aop = 2*PI-m_Aop;
 	}
 
-	double M = E_to_M(m_Ecc, F_to_E(m_Ecc, F0));
-	double n = pow(fabs(m_Gm / (m_Sem*m_Sem*m_Sem)), 0.5);
+	double _E(0);
+	double M(0);
+	if(m_Ecc<1.0)
+	{
+		_E=F2Estd(m_Ecc,F0);
+		M=E2Mstd(m_Ecc,_E);
+	}
+	else
+	{
+		_E=F2Ehyp(m_Ecc,F0);
+		M=E2Mhyp(m_Ecc,_E);
+	}
+
+	double n = 2*PI/m_period;
 	m_M0=M-n*t;
 	//printf("\nC++ E M F\n%.17lf %.17lf %.17lf\n", E, M, m_F0);
 	//printf("%.17lf %lf %.17lf %.17lf %.17lf %.17lf\n",m_Ecc,m_Sem,m_Inc,m_Lan,m_Aop,m_F0);
@@ -495,15 +526,25 @@ double orbit::f_at_position(Vector3 pos)const
 
 double orbit::f_at_t(double t)const
 {
-	double n = pow(fabs(m_Gm / (m_Sem*m_Sem*m_Sem)), 0.5);
+	double n = 2*PI/m_period;
 	double M = n*t+m_M0;
 	M = fmod(M, PI * 2);
 	if (M > PI&&m_Ecc<1.0)
 	{
 		M = M - 2*PI;
 	}
-	double E = M_to_E(m_Ecc, M);
-	double F = E_to_F(m_Ecc,E);
+	double E(0);
+	double F(0);
+	if(m_Ecc<1.0)
+	{
+		E=M2Estd(m_Ecc,M);
+		F=E2Fstd(m_Ecc,E);
+	}
+	else
+	{
+		E=M2Ehyp(m_Ecc,M);
+		F=E2Fhyp(m_Ecc,E);
+	}
 	//printf("\nC++ E M F\n%.17lf %.17lf %.17lf\n", E, M, F);
 	return F;
 }
@@ -515,9 +556,19 @@ double orbit::f_at_r(double r)const
 
 double orbit::t_to_f(double t0,double f)const
 {
-	double E=F_to_E(m_Ecc,f);
-	double M=E_to_M(m_Ecc,E);
-	double n = pow(fabs(m_Gm / (m_Sem*m_Sem*m_Sem)), 0.5);
+	double E(0);
+	double M(0);
+	if(m_Ecc<1.0)
+	{
+		E=F2Estd(m_Ecc,f);
+		M=E2Mstd(m_Ecc,E);
+	}
+	else
+	{
+		E=F2Ehyp(m_Ecc,f);
+		M=E2Mhyp(m_Ecc,E);
+	}
+	double n = 2*PI/m_period;
 	double t = (M-m_M0)/n-t0;
 	t=fmod(t,m_period);
 	if(t<0)
@@ -709,8 +760,9 @@ bodies::bodies()
 			double lan = tmp["lan"].asDouble();
 			double aop = tmp["aop"].asDouble();
 			double m0 = tmp["m0"].asDouble();
+			double orbit_period=tmp["orbit_period"].asDouble();
 			double parent_gm = m_bodies.find(b.parent)->second.gm;
-			b.orbit.reset_orbit(sem,ecc,inc,lan,aop,m0,0.0,parent_gm);
+			b.orbit.reset_rss_orbit(sem,ecc,inc,lan,aop,m0,0.0,parent_gm,orbit_period);
 			b.orbit.set_body_name(b.parent);
 		}
 

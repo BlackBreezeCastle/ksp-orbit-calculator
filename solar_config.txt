@@ -8,6 +8,7 @@
         "init_rotation": 0.0,
         "lan": 2.90714446835261,
         "m0": -0.28578484411857547,
+        "orbit_period": 217797.64365105153,
         "parent": "Uranus",
         "quaternion": [
             1.0,
@@ -30,6 +31,7 @@
         "init_rotation": 3.3161255787892263,
         "lan": 6.257044748914075,
         "m0": -0.6386685963243937,
+        "orbit_period": 1443307.2672983974,
         "parent": "Jupiter",
         "quaternion": [
             1.0,
@@ -52,6 +54,7 @@
         "init_rotation": 0.0,
         "lan": 0.40928272506899455,
         "m0": 2.4154456120683125,
+        "orbit_period": 145149013.22687092,
         "parent": "Sun",
         "quaternion": [
             1.0,
@@ -74,6 +77,7 @@
         "init_rotation": 0.0,
         "lan": 3.8817060426976,
         "m0": 0.9611395222441327,
+        "orbit_period": 552728.6526476499,
         "parent": "Pluto",
         "quaternion": [
             1.0,
@@ -96,6 +100,7 @@
         "init_rotation": 0.0,
         "lan": 0.8293618851480613,
         "m0": 0.3928709748479784,
+        "orbit_period": 109082.22372852413,
         "parent": "Mars",
         "quaternion": [
             1.0,
@@ -118,6 +123,7 @@
         "init_rotation": 0.0,
         "lan": 2.2438058824843745,
         "m0": -1.9467868170347848,
+        "orbit_period": 236764.50259459217,
         "parent": "Saturn",
         "quaternion": [
             1.0,
@@ -140,6 +146,7 @@
         "init_rotation": 1.7485284405132353,
         "lan": 6.283124227931622,
         "m0": -0.05442204172754329,
+        "orbit_period": 31558324.493098892,
         "parent": "Sun",
         "quaternion": [
             1.0,
@@ -164,6 +171,7 @@
         "init_rotation": 0.0,
         "lan": 2.2414289019459366,
         "m0": -2.779004349755448,
+        "orbit_period": 118762.25098244558,
         "parent": "Saturn",
         "quaternion": [
             1.0,
@@ -186,6 +194,7 @@
         "init_rotation": 4.014257279586958,
         "lan": 6.264615146789209,
         "m0": -3.066278093222556,
+        "orbit_period": 307000.5323729352,
         "parent": "Jupiter",
         "quaternion": [
             1.0,
@@ -208,6 +217,7 @@
         "init_rotation": 4.014257279586958,
         "lan": 6.248497270956345,
         "m0": -2.256633458465533,
+        "orbit_period": 618549.5718458771,
         "parent": "Jupiter",
         "quaternion": [
             1.0,
@@ -230,6 +240,7 @@
         "init_rotation": 0.0,
         "lan": 0.8777946513655213,
         "m0": -0.060403631577018155,
+        "orbit_period": 6853078.5702034645,
         "parent": "Saturn",
         "quaternion": [
             1.0,
@@ -252,6 +263,7 @@
         "init_rotation": 3.3161255787892263,
         "lan": 6.249092798992173,
         "m0": -2.189906215454587,
+        "orbit_period": 153038.7256265436,
         "parent": "Jupiter",
         "quaternion": [
             1.0,
@@ -274,6 +286,7 @@
         "init_rotation": 0.4363323129985824,
         "lan": 0.05693398916369617,
         "m0": -0.4725649640757723,
+        "orbit_period": 374235654.83901006,
         "parent": "Sun",
         "quaternion": [
             1.0,
@@ -301,6 +314,7 @@
         "init_rotation": 0.4363323129985824,
         "lan": 0.05850188428492847,
         "m0": 0.012083797682284661,
+        "orbit_period": 59358543.85334548,
         "parent": "Sun",
         "quaternion": [
             1.0,
@@ -326,6 +340,7 @@
         "init_rotation": 0.0,
         "lan": 0.18963720832467923,
         "m0": 0.21359912994736244,
+        "orbit_period": 7600524.037495851,
         "parent": "Sun",
         "quaternion": [
             1.0,
@@ -348,6 +363,7 @@
         "init_rotation": 0.0,
         "lan": 2.4392804048877186,
         "m0": -1.5624454960641878,
+        "orbit_period": 81843.38354899558,
         "parent": "Saturn",
         "quaternion": [
             1.0,
@@ -370,6 +386,7 @@
         "init_rotation": 0.0,
         "lan": 2.950727147646637,
         "m0": -0.8526816199150306,
+        "orbit_period": 122181.8137880058,
         "parent": "Uranus",
         "quaternion": [
             1.0,
@@ -392,6 +409,7 @@
         "init_rotation": 0.4363323129985824,
         "lan": 0.04008351366616158,
         "m0": 0.023493976505229355,
+        "orbit_period": 2356544.494804232,
         "parent": "Earth",
         "quaternion": [
             1.0,
@@ -414,6 +432,7 @@
         "init_rotation": 0.0,
         "lan": 0.061306622261752194,
         "m0": 2.867269867813319,
+        "orbit_period": 5201923319.1921425,
         "parent": "Sun",
         "quaternion": [
             1.0,
@@ -438,6 +457,7 @@
         "init_rotation": 0.0,
         "lan": 2.90926721491393,
         "m0": -0.9065210573633414,
+        "orbit_period": 1163273.9258994528,
         "parent": "Uranus",
         "quaternion": [
             1.0,
@@ -460,6 +480,7 @@
         "init_rotation": 0.0,
         "lan": 0.8112661339049586,
         "m0": -0.5678713162161899,
+        "orbit_period": 27574.89890611913,
         "parent": "Mars",
         "quaternion": [
             1.0,
@@ -482,6 +503,7 @@
         "init_rotation": 0.0,
         "lan": 0.7742454810274606,
         "m0": -1.0192233523867003,
+        "orbit_period": 7708613686.6906805,
         "parent": "Sun",
         "quaternion": [
             1.0,
@@ -506,6 +528,7 @@
         "init_rotation": 0.0,
         "lan": 2.27533438919836,
         "m0": -1.2231656837996399,
+        "orbit_period": 390534.5833430733,
         "parent": "Saturn",
         "quaternion": [
             1.0,
@@ -528,6 +551,7 @@
         "init_rotation": 0.0,
         "lan": 0.10421091037724536,
         "m0": 1.3912349728673756,
+        "orbit_period": 927494400.9162438,
         "parent": "Sun",
         "quaternion": [
             1.0,
@@ -558,6 +582,7 @@
         "init_rotation": 0.0,
         "lan": 0.0,
         "m0": 0.0,
+        "orbit_period": 0,
         "parent": "",
         "quaternion": [
             1.0,
@@ -592,6 +617,7 @@
         "init_rotation": 0.0,
         "lan": 2.081337226698542,
         "m0": -0.21972552572876178,
+        "orbit_period": 163439.05200862247,
         "parent": "Saturn",
         "quaternion": [
             1.0,
@@ -614,6 +640,7 @@
         "init_rotation": 0.0,
         "lan": 2.2077459185524977,
         "m0": 0.6316548226155713,
+        "orbit_period": 1377904.3477865746,
         "parent": "Saturn",
         "quaternion": [
             1.0,
@@ -636,6 +663,7 @@
         "init_rotation": 0.0,
         "lan": 2.908687566646332,
         "m0": -3.0033456819709645,
+        "orbit_period": 752245.8549971948,
         "parent": "Uranus",
         "quaternion": [
             1.0,
@@ -658,6 +686,7 @@
         "init_rotation": 0.0,
         "lan": 3.4417076729671052,
         "m0": 0.7616771812412864,
+        "orbit_period": 507728.9877243911,
         "parent": "Neptune",
         "quaternion": [
             1.0,
@@ -680,6 +709,7 @@
         "init_rotation": 0.0,
         "lan": 2.907022278688787,
         "m0": 2.528722249946385,
+        "orbit_period": 358093.67776494595,
         "parent": "Uranus",
         "quaternion": [
             1.0,
@@ -702,6 +732,7 @@
         "init_rotation": 0.0,
         "lan": 0.03222034301501075,
         "m0": -1.202252785307422,
+        "orbit_period": 2647395646.662511,
         "parent": "Sun",
         "quaternion": [
             1.0,
@@ -730,6 +761,7 @@
         "init_rotation": 0.0,
         "lan": 0.1393052585480437,
         "m0": 3.0742411739967817,
+        "orbit_period": 19414339.4574379,
         "parent": "Sun",
         "quaternion": [
             1.0,
@@ -752,6 +784,7 @@
         "init_rotation": 0.0,
         "lan": 0.31707611659555673,
         "m0": 2.7957356608752444,
+        "orbit_period": 114558007.89480618,
         "parent": "Sun",
         "quaternion": [
             1.0,

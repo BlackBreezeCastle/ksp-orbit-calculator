@@ -40,6 +40,7 @@ def load_json(root):
         lan=0.0
         aop=0.0
         m0=0.0
+        orbit_period=0
         rotate_speed=0.0
         init_rotation=0.0
         quaternion=(1.0,0.0,0.0,0.0)
@@ -52,13 +53,14 @@ def load_json(root):
         lan=orbit.longitude_of_ascending_node
         aop=orbit.argument_of_periapsis
         m0=orbit.mean_anomaly_at_ut(0.0)
+        orbit_period=orbit.period
         quaternion=planet_rotation(root)
         rotate_speed=root.rotational_speed
         init_rotation=root.initial_rotation
     data={root.name:{'gm':root.gravitational_parameter,'radius':root.equatorial_radius,'atmosphere_depth':root.atmosphere_depth,\
     'quaternion':quaternion,'rotate_speed':rotate_speed,'init_rotation':init_rotation,\
     'soi':root.sphere_of_influence,'satellites':children,'parent':parent,\
-    'sem':sem,'ecc':ecc,'inc':inc,'lan':lan,'aop':aop,'m0':m0}}
+    'sem':sem,'ecc':ecc,'inc':inc,'lan':lan,'aop':aop,'m0':m0,'orbit_period':orbit_period}}
     global data2
     data2={**data2,**data}
 

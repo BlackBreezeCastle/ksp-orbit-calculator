@@ -12,7 +12,8 @@ double toDay(double dt)
 
 void test1()
 {
-	
+	double t=244465.99940100007;
+	auto ss=bodies::instance()["Moon"].orbit.position_at_t(10000);
 }
 
 void test2()
@@ -28,7 +29,7 @@ void test2()
 		orbit trans1;
 		double slt=0;
 		double vpe=0;
-		double start_t=i*86400;
+		double start_t=i*86400+916751.1072915426;
 
 		if(init_transfer(start_t,init))
 		{
@@ -54,8 +55,9 @@ void test2()
 						if(fabs(trans1.next_orbit()->incliantion()-PI*0.5)<radians(1))
 						{
 							double pe_dis=trans1.next_orbit()->periapsis().magnitude()-1737100;
-							printf("\nt0:%lf slt:%lf lan:%lf pe:%lf\n",toDay(init.t0()),slt,degrees(trans1.longitude_of_ascend_node()),pe_dis);
-							//trans1.print();
+							printf("\nt0:%lf slt:%lf lan:%lf pe:%lf\n",init.t0(),slt,degrees(trans1.longitude_of_ascend_node()),pe_dis);
+							trans1.print();
+							trans1.next_orbit()->print();
 							//Vector3 dv;
 							//correct_orbit(trans1,trans1.t0()+10,dv);
 						}
