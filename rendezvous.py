@@ -41,30 +41,27 @@ sem=pow((0.5*(period2-200)/math.pi)**2*gm,1.0/3.0)
 
 
 def rendezvous(init_ob,target_ob,start_t):
-    angle=-math.pi
     period=init_ob.period()
     start_t=start_t+init_ob.t_to_f(start_t,math.pi)
-    t=start_t
+    angle=init_ob.f_at_position(target_ob.state_at_t(start_t)[0])
     for i in range(1000):
-        tmp=init_ob.f_at_position(target_ob.state_at_t(t-period1)[0])
-        #print(tmp)
-        if tmp>0 and angle<0:
+        t=period*i+start_t
+        next_angle=init_ob.f_at_position(target_ob.state_at_t(t+period)[0])
+        if next_angle>0 and angle<0:
             dock_pos=init_ob.state_at_t(t)[0]
             ap=Vector3.Tuple3(dock_pos).mag()
             print((i,t/86400,math.degrees(angle)))
-            #print('ap vector',dock_pos)
+            print('ap vector',dock_pos)
             #print('ap1 Vector3',target_ob.state_at_t(t)[0])
             new_period=target_ob.t_to_f(t,target_ob.f_at_position(dock_pos))
             #print('ap2 Vector3',target_ob.state_at_t(t+new_period)[0])
             sem=pow((0.5*new_period/math.pi)**2*gm,1.0/3.0)
             new_pe=2*sem-ap
-            print((new_pe,ap,gm))
-            speed=0#ApSpeed(new_pe,ap,gm)
+            speed=ApSpeed(new_pe,ap,gm)
             print((t,speed,new_period,2*sem-ap))
             print('\n')
-            return None
-        angle=tmp
-        t=period*i+start_t
+            return t
+        angle=next_angle
         
 rendezvous(ob1,ob2,0)
 input()
