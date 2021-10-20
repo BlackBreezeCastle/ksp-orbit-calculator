@@ -17,7 +17,7 @@ double radians(double x);
 
 double degrees(double x);
 
-//ÈıÎ¬ÏòÁ¿
+//ä¸‰ç»´å‘é‡
 class _declspec(dllexport) Vector3
 {
 private:
@@ -56,7 +56,7 @@ public:
 
 	Vector3 static Cross(const Vector3&a, const Vector3&b);
 
-	//ÏòÁ¿¼Ğ½Ç£¨»¡¶È£©
+	//å‘é‡å¤¹è§’ï¼ˆå¼§åº¦ï¼‰
 	double static Angle(const Vector3&a, const Vector3&b);
 };
 
@@ -79,7 +79,7 @@ public:
 
 	Quaternion inverse()const;
 
-	//ÓÒÊÖÏµÖá½ÇË³Ê±ÕëĞı×ª
+	//å³æ‰‹ç³»è½´è§’é¡ºæ—¶é’ˆæ—‹è½¬
 	Vector3 rotate(const Vector3 &v)const;
 };
 
@@ -96,9 +96,9 @@ private:
     Index_T m_row, m_col;
     Index_T m_size;
     Index_T m_curIndex;
-    double *m_ptr;//Êı×éÖ¸Õë
+    double *m_ptr;//æ•°ç»„æŒ‡é’ˆ
 public:
-    Matrix(Index_T r, Index_T c) :m_row(r), m_col(c)//·Ç·½Õó¹¹Ôì
+    Matrix(Index_T r, Index_T c) :m_row(r), m_col(c)//éæ–¹é˜µæ„é€ 
     {
         m_size = r*c;
         if (m_size>0)
@@ -109,7 +109,7 @@ public:
         else
             m_ptr = NULL;
     };
-    Matrix(Index_T r, Index_T c, double val ) :m_row(r), m_col(c)// ¸³³õÖµval
+    Matrix(Index_T r, Index_T c, double val ) :m_row(r), m_col(c)// èµ‹åˆå€¼val
     {
         m_size = r*c;
         if (m_size>0)
@@ -120,7 +120,7 @@ public:
         else
             m_ptr = NULL;
     };
-    Matrix(Index_T n) :m_row(n), m_col(n)//·½Õó¹¹Ôì
+    Matrix(Index_T n) :m_row(n), m_col(n)//æ–¹é˜µæ„é€ 
     {
         m_size = n*n;
         if (m_size>0)
@@ -131,7 +131,7 @@ public:
         else
             m_ptr = NULL;
     };
-    Matrix(const Matrix &rhs)//¿½±´¹¹Ôì
+    Matrix(const Matrix &rhs)//æ‹·è´æ„é€ 
     {
         m_row = rhs.m_row;
         m_col = rhs.m_col;
@@ -150,51 +150,165 @@ public:
         }
     }
  
-    Matrix  &operator=(const Matrix&);  //Èç¹ûÀà³ÉÔ±ÓĞÖ¸Õë±ØĞëÖØĞ´¸³ÖµÔËËã·û£¬±ØĞëÊÇ³ÉÔ±
+    Matrix  &operator=(const Matrix&);  //å¦‚æœç±»æˆå‘˜æœ‰æŒ‡é’ˆå¿…é¡»é‡å†™èµ‹å€¼è¿ç®—ç¬¦ï¼Œå¿…é¡»æ˜¯æˆå‘˜
     friend istream &operator>>(istream&, Matrix&);
  
-    friend ofstream &operator<<(ofstream &out, Matrix &obj);  // Êä³öµ½ÎÄ¼ş
-    friend ostream &operator<<(ostream&, Matrix&);          // Êä³öµ½ÆÁÄ»
+    friend ofstream &operator<<(ofstream &out, Matrix &obj);  // è¾“å‡ºåˆ°æ–‡ä»¶
+    friend ostream &operator<<(ostream&, Matrix&);          // è¾“å‡ºåˆ°å±å¹•
     friend Matrix &operator<<(Matrix &mat, const double val);
     friend Matrix& operator,(Matrix &obj, const double val);
     friend Matrix  operator+(const Matrix&, const Matrix&);
     friend Matrix  operator-(const Matrix&, const Matrix&);
-    friend Matrix  operator*(const Matrix&, const Matrix&);  //¾ØÕó³Ë·¨
-    friend Matrix  operator*(double, const Matrix&);  //¾ØÕó³Ë·¨
-    friend Matrix  operator*(const Matrix&, double);  //¾ØÕó³Ë·¨
+    friend Matrix  operator*(const Matrix&, const Matrix&);  //çŸ©é˜µä¹˜æ³•
+    friend Matrix  operator*(double, const Matrix&);  //çŸ©é˜µä¹˜æ³•
+    friend Matrix  operator*(const Matrix&, double);  //çŸ©é˜µä¹˜æ³•
  
-    friend Matrix  operator/(const Matrix&, double);  //¾ØÕó ³ıÒÔµ¥Êı
+    friend Matrix  operator/(const Matrix&, double);  //çŸ©é˜µ é™¤ä»¥å•æ•°
  
-    Matrix multi(const Matrix&); // ¶ÔÓ¦ÔªËØÏà³Ë
-    Matrix mtanh(); // ¶ÔÓ¦ÔªËØÏà³Ë
+    Matrix multi(const Matrix&); // å¯¹åº”å…ƒç´ ç›¸ä¹˜
+    Matrix mtanh(); // å¯¹åº”å…ƒç´ ç›¸ä¹˜
     Index_T row()const{ return m_row; }
     Index_T col()const{ return m_col; }
-    Matrix getrow(Index_T index); // ·µ»ØµÚindex ĞĞ,Ë÷Òı´Ó0 ËãÆğ
-    Matrix getcol(Index_T index); // ·µ»ØµÚindex ÁĞ
+    Matrix getrow(Index_T index); // è¿”å›ç¬¬index è¡Œ,ç´¢å¼•ä»0 ç®—èµ·
+    Matrix getcol(Index_T index); // è¿”å›ç¬¬index åˆ—
  
-    Matrix cov(_In_opt_ bool flag = true);   //Ğ­·½²îÕó »òÕßÑù±¾·½²î
-    double det();   //ĞĞÁĞÊ½
-    Matrix solveAb(Matrix &obj);  // bÊÇĞĞÏòÁ¿»òÕßÁĞÏòÁ¿
-    Matrix diag();  //·µ»Ø¶Ô½ÇÏßÔªËØ
-    //Matrix asigndiag();  //¶Ô½ÇÏßÔªËØ
-    Matrix T()const;   //×ªÖÃ
-    void sort(bool);//trueÎª´ÓĞ¡µ½´ó
+    Matrix cov(_In_opt_ bool flag = true);   //åæ–¹å·®é˜µ æˆ–è€…æ ·æœ¬æ–¹å·®
+    double det();   //è¡Œåˆ—å¼
+    Matrix solveAb(Matrix &obj);  // bæ˜¯è¡Œå‘é‡æˆ–è€…åˆ—å‘é‡
+    Matrix diag();  //è¿”å›å¯¹è§’çº¿å…ƒç´ 
+    //Matrix asigndiag();  //å¯¹è§’çº¿å…ƒç´ 
+    Matrix T()const;   //è½¬ç½®
+    void sort(bool);//trueä¸ºä»å°åˆ°å¤§
     Matrix adjoint();
     Matrix inverse();
     void QR(_Out_ Matrix&, _Out_ Matrix&)const;
     Matrix eig_val(_In_opt_ Index_T _iters = 1000);
     Matrix eig_vect(_In_opt_ Index_T _iters = 1000);
  
-    double norm1();//1·¶Êı
-    double norm2();//2·¶Êı
-    double mean();// ¾ØÕó¾ùÖµ
-    double*operator[](Index_T i){ return m_ptr + i*m_col; }//×¢Òâthis¼ÓÀ¨ºÅ£¬ (*this)[i][j]
-    void zeromean(_In_opt_  bool flag = true);//Ä¬ÈÏ²ÎÊıÎªtrue¼ÆËãÁĞ
-    void normalize(_In_opt_  bool flag = true);//Ä¬ÈÏ²ÎÊıÎªtrue¼ÆËãÁĞ
-    Matrix exponent(double x);//Ã¿¸öÔªËØx´ÎÃİ
-    Matrix  eye();//¶Ô½ÇÕó
-    void  maxlimit(double max,double set=0);//¶Ô½ÇÕó
+    double norm1();//1èŒƒæ•°
+    double norm2();//2èŒƒæ•°
+    double mean();// çŸ©é˜µå‡å€¼
+    double*operator[](Index_T i){ return m_ptr + i*m_col; }//æ³¨æ„thisåŠ æ‹¬å·ï¼Œ (*this)[i][j]
+    void zeromean(_In_opt_  bool flag = true);//é»˜è®¤å‚æ•°ä¸ºtrueè®¡ç®—åˆ—
+    void normalize(_In_opt_  bool flag = true);//é»˜è®¤å‚æ•°ä¸ºtrueè®¡ç®—åˆ—
+    Matrix exponent(double x);//æ¯ä¸ªå…ƒç´ xæ¬¡å¹‚
+    Matrix  eye();//å¯¹è§’é˜µ
+    void  maxlimit(double max,double set=0);//å¯¹è§’é˜µ
 };
  
+//çº¿æ€§æ’å€¼
+class LinearInterpolation
+{
+private:
+	struct Tuple
+	{
+		double key;
+		double value;
 
+		void operator =(Tuple b)
+		{
+			key = b.key;
+			value = b.value;
+		}
+	};
+	std::vector<Tuple> m_Data;
+public:
+	//æ·»åŠ æ’å€¼ç‚¹ï¼Œkeyè¡¨ç¤ºæ¨ªåæ ‡ï¼Œvalueè¡¨ç¤ºçºµåæ ‡
+	void addValue(double key, double value)
+	{
+		Tuple tmp;
+		tmp.key = key;
+		tmp.value = value;
+		m_Data.push_back(tmp);
+		//æ’å…¥æ’åº
+		for (int i = m_Data.size() - 1; i--; i > 0)
+		{
+			if (m_Data[i].key < m_Data[i - 1].key)
+			{
+				tmp = m_Data[i];
+				m_Data[i] = m_Data[i - 1];
+				m_Data[i - 1] = tmp;
+			}
+			else
+			{
+				break;
+			}
+		}
+	}
+
+	//æ ¹æ®æ¨ªåæ ‡è·å¾—çºµåæ ‡
+	double getValue(double key)
+	{
+		if (m_Data.size() < 1)
+		{
+			return 0.0;
+		}
+
+		int left = 0;
+		int right = m_Data.size() - 1;
+
+		//äºŒåˆ†æ³•æŸ¥æ‰¾
+		while (right > left + 1)
+		{
+			int tmp = (left + right) / 2;
+			if (m_Data[tmp].key > key)
+			{
+				right = tmp;
+			}
+			else
+			{
+				left = tmp;
+			}
+		}
+		//çº¿æ€§æ’å€¼
+		Tuple leftCode = m_Data[left];
+		Tuple rightCode = m_Data[right];
+
+		double k = (rightCode.value - leftCode.value) / (rightCode.key - leftCode.key);
+		if (fabs(k) >1e10)
+		{
+			return 0.5 * (leftCode.value + rightCode.value);
+		}
+		else
+		{
+			return leftCode.value + k* (key - leftCode.key);
+		}
+	
+	}
+
+	//æ ¹æ®çºµåæ ‡è·å–æ¨ªåæ ‡ï¼Œåªå–ç¬¬ä¸€ä¸ªç»“æœï¼Œå¤±è´¥è¿”å›HUGE_VALD
+	double getKey(double value)
+	{
+		if (m_Data.size() <= 1)
+		{
+			return HUGE_VALD;
+		}
+
+		auto lSign = [](double x)
+		{
+			if (x > 0.0)
+			{
+				return 1.0;
+			}
+			else if (x < 0.0)
+			{
+				return -1.0;
+			}
+			else
+			{
+				return 0.0;
+			}
+		};
+		double sig = lSign(m_Data[0].value-value);
+		for (int i = 1; i < m_Data.size(); i++)
+		{
+			if (sig * lSign(m_Data[i].value - value)<=0.0)
+			{
+				double k = (m_Data[i].value - m_Data[i-1].value) / (m_Data[i].key - m_Data[i-1].key);
+				return m_Data[i].value - (m_Data[i].value - value) / k;
+			}
+		}
+		return HUGE_VALD;
+	}
+};
  
