@@ -221,8 +221,13 @@ public:
 		tmp.value = value;
 		m_Data.push_back(tmp);
 		//插入排序
-		for (int i = m_Data.size() - 1; i--; i > 0)
+		for (int i = m_Data.size() - 1; i--; )
 		{
+			if (i < 1)
+			{
+				break;
+			}
+
 			if (m_Data[i].key < m_Data[i - 1].key)
 			{
 				tmp = m_Data[i];
@@ -305,7 +310,7 @@ public:
 			if (sig * lSign(m_Data[i].value - value)<=0.0)
 			{
 				double k = (m_Data[i].value - m_Data[i-1].value) / (m_Data[i].key - m_Data[i-1].key);
-				return m_Data[i].value - (m_Data[i].value - value) / k;
+				return m_Data[i].key - (m_Data[i].value - value) / k;
 			}
 		}
 		return HUGE_VALD;
